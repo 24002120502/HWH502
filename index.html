@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HWH · 《高级网页设计》课堂实践</title>
+    <style>
+        /* ===== 全局重置 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            line-height: 1.7;
+        }
+
+        /* ===== 页头 ===== */
+        .page-header {
+            background: linear-gradient(135deg, #1e3a8a, #5b8def, #9b6bd6);
+            color: #fff;
+            padding: 56px 24px 72px;
+            text-align: center;
+        }
+
+        .page-header .course {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 4px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-bottom: 18px;
+        }
+
+        .page-header h1 {
+            font-size: 40px;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+
+        .page-header .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* ===== 主体 ===== */
+        .page-main {
+            max-width: 960px;
+            margin: -40px auto 40px;
+            padding: 0 20px;
+        }
+
+        .case {
+            background: #fff;
+            padding: 26px 30px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            border: 2px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .case-title {
+            font-size: 20px;
+            padding: 0 12px;
+            border-left: 4px solid #5b8def;
+            margin-bottom: 20px;
+        }
+
+        /* ===== 课堂目录卡片 ===== */
+        .card-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .card-link {
+            /* 放大缩小自适应，基础宽度260，窄屏自动变单列 */
+            flex: 1 1 260px;
+            display: block;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card-link:hover {
+            transform: translateY(-6px);
+        }
+
+        .card {
+            background: linear-gradient(135deg, #5b8def, #7aa8f7);
+            color: #fff;
+            padding: 26px;
+            border-radius: 10px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 14px rgba(91, 141, 239, 0.3);
+        }
+
+        .card-link:nth-child(2) .card {
+            background: linear-gradient(135deg, #3fb582, #62c9a1);
+            box-shadow: 0 4px 14px rgba(63, 181, 130, 0.3);
+        }
+
+        /* 待添加模块的占位卡片 */
+        .card.placeholder {
+            background: #f7f8fa;
+            color: #9ca3af;
+            border: 2px dashed #d1d5db;
+            box-shadow: none;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .card .num {
+            font-size: 13px;
+            opacity: 0.85;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .card h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            font-size: 14px;
+            opacity: 0.92;
+            flex: 1;
+        }
+
+        .card .go {
+            display: block;
+            margin-top: 14px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        /* ===== 页脚 ===== */
+        .page-footer {
+            text-align: center;
+            padding: 24px;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 600px) {
+            .page-header {
+                padding: 40px 16px 56px;
+            }
+
+            .page-header h1 {
+                font-size: 26px;
+            }
+
+            .case {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <span class="course">课堂实践</span>
+        <h1>HWH ·《高级网页设计》</h1>
+        <p class="subtitle">本目录所有练习页面的导航入口 · 原生 HTML / CSS / JS，不依赖任何 CDN</p>
+    </header>
+
+    <main class="page-main">
+        <!-- 课堂目录 -->
+        <section class="case">
+            <h2 class="case-title">课堂目录</h2>
+            <div class="card-grid">
+                <a href="html/flex布局复习.html" class="card-link">
+                    <div class="card">
+                        <span class="num">MODULE 01</span>
+                        <h3>Flex 复习</h3>
+                        <p>四个经典案例：导航布局、三等分布局、响应式卡片网格、侧边栏布局，覆盖 justify-content / align-items / flex 等核心属性。</p>
+                        <span class="go">进入 →</span>
+                    </div>
+                </a>
+
+                <a href="html/svg005.HTML" class="card-link">
+                    <div class="card">
+                        <span class="num">MODULE 02</span>
+                        <h3>字体图标</h3>
+                        <p>iconfont 字体图标 + SVG symbol 用法，移动端底部 tab 栏布局，JS 切换 active 状态交互。</p>
+                        <span class="go">进入 →</span>
+                    </div>
+                </a>
+
+                <a href="#" class="card-link">
+                    <div class="card placeholder">
+                        <span class="num">MODULE 03</span>
+                        <h3>待添加</h3>
+                        <p>更多模块后续增加</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="page-footer">
+        <p>HWH ·《高级网页设计》课堂实践 · 纯原生代码编写</p>
+    </footer>
+</body>
+</html>

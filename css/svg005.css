@@ -1,0 +1,107 @@
+/* iconfont官方提供的svg图标基础样式 */
+.icon {
+  width: 1em;
+  height: 1em;
+  /* 图标和文字基线对齐 */
+  vertical-align: -0.15em;
+  /* 跟随文字颜色，改color就能换图标色 */
+  fill: currentColor;
+  overflow: hidden;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  /* 给底部固定的tab留出空间，避免内容被挡住 */
+  padding-bottom: 70px;
+}
+
+/* 底部固定tab栏，典型的移动端布局 */
+.tab-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  height: 60px;
+  background: #fff;
+  border-top: 1px solid #eee;
+}
+
+.tab-item {
+  /* flex: 1让每个tab平均分宽 */
+  flex: 1;
+  display: flex;
+  /* column让图标在上、文字在下 */
+  flex-direction: column;
+  /* align-items控制水平对齐，可选值：center、flex-start、flex-end、stretch */
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.3s;
+  position: relative;
+}
+
+.tab-item svg {
+  font-size: 24px;
+  margin: 3px;
+}
+
+.tab-item span {
+  font-size: 12px;
+}
+
+/* active状态：JS点击时加上这个类 */
+.tab-item.active {
+  color: #ff6324;
+}
+
+/* ===== 徽标：红点 / 数字 ===== */
+/* 红点：小圆点，表示"有新内容"，定位到图标右上角 */
+.budge-dot {
+  position: absolute;
+  /* 图标水平居中，50%是tab项的中线，往右偏一点正好贴住图标右上角 */
+  left: 50%;
+  margin-left: 8px;
+  top: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ff6324;
+  /* 白色描边，让红点从背景里"跳"出来 */
+  border: 2px solid #fff;
+}
+
+/* 数字徽标：宽度随数字自适应，1位数是圆形、多位数变胶囊 */
+.budge-num {
+  position: absolute;
+  left: 50%;
+  margin-left: 6px;
+  top: 2px;
+  /* 去掉固定width，用min-width保证1位数不会被压扁 */
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background-color: #ff6324;
+  color: #fff;
+  font-size: 10px;
+  /* 行高 = 高度 - 上下边框(2+2)，让数字垂直居中 */
+  line-height: 12px;
+  text-align: center;
+  border: 2px solid #fff;
+}
+
+/* 数字超过99时（显示99+）用这个类，把徽标再拉宽一点 */
+.budge-num.max {
+  min-width: 24px;
+  padding: 0 5px;
+}
