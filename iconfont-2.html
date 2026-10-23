@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>运线 — SVG 图标展 · HWH 图标工坊</title>
+<script src="cdn/lucide/lucide.min.js" defer></script>
+<style>
+  :root{
+    --HWH_paper:#EDECE7;
+    --HWH_ink:#1B1814;
+    --HWH_klein:#0F2DB3;
+    --HWH_seal:#C03540;
+    --HWH_pine:#2F6B4F;
+    --HWH_ochre:#B07D2B;
+    --HWH_hairline:#BDB9AE;
+    --HWH_stroke:1.75;
+    --HWH_tint:#1B1814;
+    --HWH_song:"STSong","SimSun","NSimSun",serif;
+    --HWH_didot:"Didot","Bodoni MT","Playfair Display",Georgia,serif;
+    --HWH_kai:"KaiTi","STKaiti","FZKai-Z03S",serif;
+    --HWH_body:system-ui,"Segoe UI","Microsoft YaHei",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:var(--HWH_paper);
+    color:var(--HWH_ink);
+    font-family:var(--HWH_body);
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--HWH_klein);color:var(--HWH_paper)}
+  a{color:inherit}
+  :focus-visible{outline:2px solid var(--HWH_klein);outline-offset:2px}
+
+  /* ---------- 左侧竖排题签 ---------- */
+  .HWH_rail{
+    position:fixed;left:0;top:0;bottom:0;width:52px;
+    border-right:1px solid var(--HWH_hairline);
+    display:flex;align-items:flex-start;justify-content:center;
+    padding-top:36px;z-index:5;background:var(--HWH_paper);
+  }
+  .HWH_rail span{
+    writing-mode:vertical-rl;font-family:var(--HWH_kai);
+    font-size:13px;letter-spacing:8px;color:#6B665D;
+  }
+  .HWH_rail b{
+    writing-mode:vertical-rl;font-family:var(--HWH_song);font-weight:400;
+    font-size:15px;letter-spacing:6px;margin-top:22px;
+  }
+
+  .HWH_page{margin-left:52px}
+
+  /* ---------- 页眉 ---------- */
+  .HWH_header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:26px clamp(20px,5vw,64px);
+    border-bottom:1px solid var(--HWH_hairline);
+  }
+  .HWH_brandBox{display:flex;align-items:center;gap:16px}
+  .HWH_seal{
+    width:52px;height:52px;background:var(--HWH_seal);color:var(--HWH_paper);
+    font-family:var(--HWH_kai);font-size:19px;line-height:1.15;
+    writing-mode:vertical-rl;text-align:center;
+    display:flex;align-items:center;justify-content:center;
+    letter-spacing:2px;box-shadow:inset 0 0 0 2px var(--HWH_paper),inset 0 0 0 3px var(--HWH_seal);
+  }
+  .HWH_brand{font-family:var(--HWH_song);font-size:20px;letter-spacing:6px}
+  .HWH_brand small{display:block;font-family:var(--HWH_didot);font-size:11px;letter-spacing:4px;font-style:italic;color:var(--HWH_klein)}
+  .HWH_nav{display:flex;gap:28px;font-size:14px}
+  .HWH_nav a{text-decoration:none;border-bottom:1px solid transparent;padding-bottom:2px}
+  .HWH_nav a:hover{border-color:var(--HWH_klein);color:var(--HWH_klein)}
+  .HWH_nav .HWH_here{color:var(--HWH_klein);border-color:var(--HWH_klein)}
+
+  /* ---------- 运线 hero ---------- */
+  .HWH_hero{
+    position:relative;overflow:hidden;
+    padding:clamp(64px,10vw,120px) clamp(20px,5vw,64px) clamp(56px,8vw,96px);
+  }
+  .HWH_heroIcon{
+    position:absolute;right:clamp(-40px,2vw,60px);top:50%;
+    transform:translateY(-52%);
+    width:clamp(240px,34vw,420px);height:clamp(240px,34vw,420px);
+    color:var(--HWH_klein);opacity:.9;pointer-events:none;
+  }
+  .HWH_heroIcon svg{width:100%;height:100%}
+  .HWH_heroIn{position:relative;max-width:640px}
+  .HWH_dynasty{
+    font-family:var(--HWH_kai);font-size:15px;color:var(--HWH_seal);letter-spacing:8px;
+  }
+  .HWH_title{
+    font-family:var(--HWH_song);font-weight:400;
+    font-size:clamp(64px,11vw,128px);letter-spacing:.18em;
+    line-height:1.15;margin:10px 0 6px;
+  }
+  .HWH_titleEn{
+    font-family:var(--HWH_didot);font-style:italic;font-size:clamp(15px,2vw,20px);
+    letter-spacing:3px;color:var(--HWH_klein);
+  }
+  .HWH_lede{max-width:32em;margin-top:26px;font-size:15px;color:#4A463F}
+  .HWH_lede em{font-style:normal;color:var(--HWH_klein)}
+
+  /* 绘线时刻：JS 置 pathLength 后才启用 */
+  .HWH_heroIcon.HWH_ready svg :is(path,circle,line,rect,polyline,polygon,ellipse){
+    stroke-dasharray:1;stroke-dashoffset:1;
+    animation:HWH_draw 2.4s cubic-bezier(.55,.06,.28,.99) forwards .25s;
+  }
+  @keyframes HWH_draw{to{stroke-dashoffset:0}}
+  @media (prefers-reduced-motion:reduce){
+    .HWH_heroIcon.HWH_ready svg :is(path,circle,line,rect,polyline,polygon,ellipse){
+      animation:none;stroke-dasharray:none;stroke-dashoffset:0;
+    }
+  }
+
+  /* ---------- 展区通用 ---------- */
+  .HWH_zone{padding:0 clamp(20px,5vw,64px) 90px}
+  .HWH_zoneHead{
+    display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;
+    border-top:1px solid var(--HWH_ink);
+    padding-top:14px;margin-bottom:8px;
+  }
+  .HWH_zoneHead h2{font-family:var(--HWH_song);font-weight:400;font-size:26px;letter-spacing:8px}
+  .HWH_zoneHead p{font-family:var(--HWH_kai);font-size:14px;color:#6B665D}
+  .HWH_zoneHead .HWH_en{margin-left:auto;font-family:var(--HWH_didot);font-style:italic;font-size:13px;color:var(--HWH_klein)}
+
+  /* ---------- 线之粗细 ---------- */
+  .HWH_strokeBar{
+    border-block:1px solid var(--HWH_hairline);
+    padding:40px 0 34px;
+    display:flex;flex-wrap:wrap;align-items:center;gap:clamp(20px,4vw,56px);
+  }
+  .HWH_sliderBox{display:flex;flex-direction:column;gap:12px;min-width:260px}
+  .HWH_sliderBox label{font-family:var(--HWH_kai);font-size:14px;color:#6B665D}
+  .HWH_sliderBox label b{
+    font-family:var(--HWH_didot);font-style:italic;font-weight:400;
+    color:var(--HWH_klein);font-size:16px;
+  }
+  .HWH_slider{
+    appearance:none;width:100%;height:2px;background:var(--HWH_ink);outline-offset:6px;
+  }
+  .HWH_slider::-webkit-slider-thumb{
+    appearance:none;width:18px;height:18px;border-radius:50%;
+    background:var(--HWH_klein);border:3px solid var(--HWH_paper);
+    box-shadow:0 0 0 1px var(--HWH_klein);cursor:pointer;
+  }
+  .HWH_slider::-moz-range-thumb{
+    width:14px;height:14px;border-radius:50%;
+    background:var(--HWH_klein);border:3px solid var(--HWH_paper);
+    box-shadow:0 0 0 1px var(--HWH_klein);cursor:pointer;
+  }
+  .HWH_strokeRow{display:flex;gap:clamp(14px,3vw,40px);align-items:center}
+  .HWH_strokeRow svg{width:46px;height:46px;color:var(--HWH_ink);stroke-width:var(--HWH_stroke)}
+  .HWH_strokeRow .HWH_heroDemo svg{width:72px;height:72px;color:var(--HWH_klein)}
+
+  /* ---------- 线之画廊 ---------- */
+  .HWH_gallery{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));
+    border-top:1px solid var(--HWH_hairline);border-left:1px solid var(--HWH_hairline);
+    color:var(--HWH_tint);
+  }
+  .HWH_cell{
+    appearance:none;background:none;border:none;cursor:pointer;font:inherit;
+    border-right:1px solid var(--HWH_hairline);border-bottom:1px solid var(--HWH_hairline);
+    aspect-ratio:1/1;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:12px;
+    color:inherit;transition:background .25s,color .25s;
+  }
+  .HWH_cell svg{width:30px;height:30px}
+  .HWH_cell .HWH_code{font-family:var(--HWH_didot);font-size:12px;letter-spacing:.5px}
+  .HWH_cell:hover{background:var(--HWH_klein);color:var(--HWH_paper)}
+  .HWH_cell:hover svg{stroke-width:1.25}
+
+  /* ---------- 线之色 ---------- */
+  .HWH_tintZone{display:flex;flex-wrap:wrap;align-items:center;gap:clamp(20px,4vw,56px)}
+  .HWH_swatches{display:flex;gap:12px}
+  .HWH_swatch{
+    width:34px;height:34px;border-radius:50%;cursor:pointer;
+    border:1px solid var(--HWH_hairline);transition:transform .2s;
+  }
+  .HWH_swatch:hover{transform:scale(1.12)}
+  .HWH_swatch.HWH_on{box-shadow:0 0 0 2px var(--HWH_paper),0 0 0 3.5px var(--HWH_ink)}
+  .HWH_tintRow{display:flex;gap:clamp(14px,3vw,40px);align-items:center;color:var(--HWH_tint)}
+  .HWH_tintRow svg{width:40px;height:40px}
+  .HWH_tintNote{font-family:var(--HWH_kai);font-size:14px;color:#6B665D;margin-top:14px}
+
+  /* ---------- 用法 ---------- */
+  .HWH_usage{margin-top:26px}
+  .HWH_usageCode{
+    background:var(--HWH_ink);color:#D8D4CA;font-size:13.5px;line-height:2;
+    padding:26px 28px;overflow-x:auto;
+    font-family:Consolas,"Courier New",monospace;
+  }
+  .HWH_usageCode .HWH_tag{color:#8FA6E8}
+  .HWH_usageCode .HWH_str{color:#E0B089}
+
+  /* ---------- 页脚 ---------- */
+  .HWH_footer{
+    border-top:1px solid var(--HWH_ink);
+    padding:30px clamp(20px,5vw,64px) 44px;
+    display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;
+  }
+  .HWH_footer .HWH_colophon{font-family:var(--HWH_kai);font-size:13px;color:#6B665D}
+  .HWH_footerLinks{display:flex;gap:24px;font-size:14px}
+  .HWH_footerLinks a{text-decoration:none;border-bottom:1px solid var(--HWH_hairline);padding-bottom:2px}
+  .HWH_footerLinks a:hover{color:var(--HWH_klein);border-color:var(--HWH_klein)}
+
+  /* ---------- 复制回执 ---------- */
+  .HWH_toast{
+    position:fixed;left:calc(50% + 26px);bottom:34px;transform:translate(-50%,16px);
+    background:var(--HWH_ink);color:var(--HWH_paper);
+    font-size:13px;letter-spacing:1px;padding:10px 22px;
+    opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;z-index:9;
+  }
+  .HWH_toast.HWH_show{opacity:1;transform:translate(-50%,0)}
+
+  @media (max-width:640px){
+    .HWH_nav{display:none}
+    .HWH_rail{display:none}
+    .HWH_page{margin-left:0}
+    .HWH_title{letter-spacing:.1em}
+    .HWH_heroIcon{opacity:.14}
+    .HWH_toast{left:50%}
+  }
+</style>
+</head>
+<body>
+
+<aside class="HWH_rail" aria-hidden="true">
+  <span>矢量勾线 · 一笔成形</span>
+  <b>第二展室</b>
+</aside>
+
+<div class="HWH_page">
+<header class="HWH_header">
+  <div class="HWH_brandBox">
+    <div class="HWH_seal" aria-hidden="true">HWH印</div>
+    <div class="HWH_brand">图标工坊<small>HWH Icon Atelier</small></div>
+  </div>
+  <nav class="HWH_nav">
+    <a href="index.html">首页</a>
+    <a href="iconfont-1.html">铸墨 · 字体图标</a>
+    <a class="HWH_here" href="iconfont-2.html">运线 · SVG 图标</a>
+  </nav>
+</header>
+
+<main>
+  <section class="HWH_hero">
+    <div class="HWH_heroIcon" id="HWH_heroIcon" aria-hidden="true">
+      <i data-lucide="feather"></i>
+    </div>
+    <div class="HWH_heroIn">
+      <p class="HWH_dynasty">第二展室 · 矢量图标</p>
+      <h1 class="HWH_title">运线</h1>
+      <p class="HWH_titleEn">Drawn in Stroke — Lucide</p>
+      <p class="HWH_lede">
+        不再铸字，改用<em>钢笔运线</em>：每一枚图标是一段内联 SVG，
+        线条粗细可调，墨色随心而染，且无论放大多少倍，线条始终<em>锋利如初</em>。
+      </p>
+    </div>
+  </section>
+
+  <section class="HWH_zone">
+    <div class="HWH_zoneHead">
+      <h2>线之粗细</h2>
+      <p>拖动滑杆，线条应声而变</p>
+      <span class="HWH_en">stroke width</span>
+    </div>
+    <div class="HWH_strokeBar">
+      <div class="HWH_sliderBox">
+        <label for="HWH_strokeRange">描边宽度 <b id="HWH_strokeValue">1.75</b></label>
+        <input class="HWH_slider" id="HWH_strokeRange" type="range" min="0.5" max="3" step="0.25" value="1.75">
+      </div>
+      <div class="HWH_strokeRow" id="HWH_strokeRow">
+        <span class="HWH_heroDemo"><i data-lucide="compass"></i></span>
+        <span><i data-lucide="star"></i></span>
+        <span><i data-lucide="heart"></i></span>
+        <span><i data-lucide="coffee"></i></span>
+        <span><i data-lucide="zap"></i></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="HWH_zone">
+    <div class="HWH_zoneHead">
+      <h2>线之画廊</h2>
+      <p>点击任意线稿，复制其调用代码</p>
+      <span class="HWH_en">the line gallery</span>
+    </div>
+    <div class="HWH_gallery" id="HWH_gallery">
+      <button class="HWH_cell" type="button" data-HWH-copy="house"><i data-lucide="house"></i><span class="HWH_code">house</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="pen-line"><i data-lucide="pen-line"></i><span class="HWH_code">pen-line</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="palette"><i data-lucide="palette"></i><span class="HWH_code">palette</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="camera"><i data-lucide="camera"></i><span class="HWH_code">camera</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="music"><i data-lucide="music"></i><span class="HWH_code">music</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="heart"><i data-lucide="heart"></i><span class="HWH_code">heart</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="star"><i data-lucide="star"></i><span class="HWH_code">star</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="zap"><i data-lucide="zap"></i><span class="HWH_code">zap</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="flame"><i data-lucide="flame"></i><span class="HWH_code">flame</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="settings"><i data-lucide="settings"></i><span class="HWH_code">settings</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="search"><i data-lucide="search"></i><span class="HWH_code">search</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="mail"><i data-lucide="mail"></i><span class="HWH_code">mail</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="map-pin"><i data-lucide="map-pin"></i><span class="HWH_code">map-pin</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="calendar"><i data-lucide="calendar"></i><span class="HWH_code">calendar</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="clock"><i data-lucide="clock"></i><span class="HWH_code">clock</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="cloud"><i data-lucide="cloud"></i><span class="HWH_code">cloud</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="moon"><i data-lucide="moon"></i><span class="HWH_code">moon</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="sun"><i data-lucide="sun"></i><span class="HWH_code">sun</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="brush"><i data-lucide="brush"></i><span class="HWH_code">brush</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="layers"><i data-lucide="layers"></i><span class="HWH_code">layers</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="scissors"><i data-lucide="scissors"></i><span class="HWH_code">scissors</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="anchor"><i data-lucide="anchor"></i><span class="HWH_code">anchor</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="coffee"><i data-lucide="coffee"></i><span class="HWH_code">coffee</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="leaf"><i data-lucide="leaf"></i><span class="HWH_code">leaf</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="bird"><i data-lucide="bird"></i><span class="HWH_code">bird</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="rocket"><i data-lucide="rocket"></i><span class="HWH_code">rocket</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="code"><i data-lucide="code"></i><span class="HWH_code">code</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="terminal"><i data-lucide="terminal"></i><span class="HWH_code">terminal</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="database"><i data-lucide="database"></i><span class="HWH_code">database</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="umbrella"><i data-lucide="umbrella"></i><span class="HWH_code">umbrella</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="gem"><i data-lucide="gem"></i><span class="HWH_code">gem</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="bell"><i data-lucide="bell"></i><span class="HWH_code">bell</span></button>
+    </div>
+  </section>
+
+  <section class="HWH_zone">
+    <div class="HWH_zoneHead">
+      <h2>线之色</h2>
+      <p>SVG 用 currentColor 上墨，点色即染</p>
+      <span class="HWH_en">colorable</span>
+    </div>
+    <div class="HWH_tintZone">
+      <div class="HWH_swatches" id="HWH_swatches">
+        <button class="HWH_swatch HWH_on" type="button" style="background:#1B1814" data-HWH-color="#1B1814" aria-label="墨色"></button>
+        <button class="HWH_swatch" type="button" style="background:#0F2DB3" data-HWH-color="#0F2DB3" aria-label="克莱因蓝"></button>
+        <button class="HWH_swatch" type="button" style="background:#C03540" data-HWH-color="#C03540" aria-label="印泥红"></button>
+        <button class="HWH_swatch" type="button" style="background:#2F6B4F" data-HWH-color="#2F6B4F" aria-label="松绿"></button>
+        <button class="HWH_swatch" type="button" style="background:#B07D2B" data-HWH-color="#B07D2B" aria-label="赭金"></button>
+      </div>
+      <div class="HWH_tintRow" id="HWH_tintRow">
+        <i data-lucide="feather"></i>
+        <i data-lucide="compass"></i>
+        <i data-lucide="flower"></i>
+        <i data-lucide="bird"></i>
+      </div>
+    </div>
+    <p class="HWH_tintNote">线条继承 currentColor，一个 CSS 变量即可为整廊换墨。</p>
+  </section>
+
+  <section class="HWH_zone">
+    <div class="HWH_zoneHead">
+      <h2>用法</h2>
+      <p>脚本与占位元素</p>
+      <span class="HWH_en">how to use</span>
+    </div>
+    <pre class="HWH_usageCode"><code>&lt;<span class="HWH_tag">script</span> <span class="HWH_str">src="cdn/lucide/lucide.min.js"</span>&gt;&lt;/<span class="HWH_tag">script</span>&gt;
+&lt;<span class="HWH_tag">script</span>&gt; lucide.createIcons(); &lt;/<span class="HWH_tag">script</span>&gt;
+
+&lt;<span class="HWH_tag">i</span> <span class="HWH_str">data-lucide="feather"</span>&gt;&lt;/<span class="HWH_tag">i</span>&gt;   <span class="HWH_str">&lt;!-- 渲染为内联 SVG --&gt;</span></code></pre>
+  </section>
+</main>
+
+<footer class="HWH_footer">
+  <p class="HWH_colophon">高级网页设计 · 图标专题 · 本地 CDN 已收录至 cdn 目录</p>
+  <div class="HWH_footerLinks">
+    <a href="index.html">返回首页</a>
+    <a href="iconfont-1.html">回看「铸墨」展 →</a>
+  </div>
+</footer>
+</div>
+
+<div class="HWH_toast" id="HWH_toast" role="status"><span id="HWH_toastText"></span></div>
+
+<script>
+  var HWH_toast = document.getElementById('HWH_toast');
+  var HWH_toastText = document.getElementById('HWH_toastText');
+  var HWH_toastTimer = null;
+
+  function HWH_showToast(HWH_msg){
+    HWH_toastText.textContent = HWH_msg;
+    HWH_toast.classList.add('HWH_show');
+    clearTimeout(HWH_toastTimer);
+    HWH_toastTimer = setTimeout(function(){
+      HWH_toast.classList.remove('HWH_show');
+    }, 1800);
+  }
+
+  function HWH_afterIcons(){
+    /* 绘线时刻：为 hero 图形的每一段路径标记 pathLength，交由 CSS 播放 */
+    var HWH_hero = document.getElementById('HWH_heroIcon');
+    var HWH_shapes = HWH_hero.querySelectorAll('path,circle,line,rect,polyline,polygon,ellipse');
+    HWH_shapes.forEach(function(HWH_s){ HWH_s.setAttribute('pathLength','1'); });
+    HWH_hero.classList.add('HWH_ready');
+  }
+
+  if(window.lucide){
+    lucide.createIcons();
+    HWH_afterIcons();
+  } else {
+    window.addEventListener('DOMContentLoaded', function(){
+      if(window.lucide){ lucide.createIcons(); HWH_afterIcons(); }
+    });
+  }
+
+  /* 线之粗细 */
+  var HWH_strokeRange = document.getElementById('HWH_strokeRange');
+  var HWH_strokeValue = document.getElementById('HWH_strokeValue');
+  HWH_strokeRange.addEventListener('input', function(){
+    HWH_strokeValue.textContent = HWH_strokeRange.value;
+    document.documentElement.style.setProperty('--HWH_stroke', HWH_strokeRange.value);
+  });
+
+  /* 线之色 */
+  var HWH_tintRow = document.getElementById('HWH_tintRow');
+  document.getElementById('HWH_swatches').addEventListener('click', function(HWH_e){
+    var HWH_swatch = HWH_e.target.closest('.HWH_swatch');
+    if(!HWH_swatch) return;
+    document.querySelectorAll('.HWH_swatch').forEach(function(HWH_b){
+      HWH_b.classList.remove('HWH_on');
+    });
+    HWH_swatch.classList.add('HWH_on');
+    HWH_tintRow.style.setProperty('--HWH_tint', HWH_swatch.getAttribute('data-HWH-color'));
+  });
+
+  /* 线之画廊：复制调用代码 */
+  document.getElementById('HWH_gallery').addEventListener('click', function(HWH_e){
+    var HWH_cell = HWH_e.target.closest('.HWH_cell');
+    if(!HWH_cell) return;
+    var HWH_name = HWH_cell.getAttribute('data-HWH-copy');
+    var HWH_text = '<i data-lucide="' + HWH_name + '"><\/i>';
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(HWH_text).then(function(){
+        HWH_showToast('已复制：' + HWH_text);
+      });
+    } else {
+      HWH_showToast('代码：' + HWH_text);
+    }
+  });
+</script>
+</body>
+</html>

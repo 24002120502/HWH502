@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>铸墨 — 字体图标展 · HWH 图标工坊</title>
+<link rel="stylesheet" href="cdn/fontawesome/css/all.min.css">
+<style>
+  :root{
+    --HWH_paper:#EDECE7;
+    --HWH_ink:#1B1814;
+    --HWH_klein:#0F2DB3;
+    --HWH_seal:#C03540;
+    --HWH_hairline:#BDB9AE;
+    --HWH_song:"STSong","SimSun","NSimSun",serif;
+    --HWH_didot:"Didot","Bodoni MT","Playfair Display",Georgia,serif;
+    --HWH_kai:"KaiTi","STKaiti","FZKai-Z03S",serif;
+    --HWH_body:system-ui,"Segoe UI","Microsoft YaHei",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:var(--HWH_paper);
+    color:var(--HWH_ink);
+    font-family:var(--HWH_body);
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--HWH_klein);color:var(--HWH_paper)}
+  a{color:inherit}
+  :focus-visible{outline:2px solid var(--HWH_klein);outline-offset:2px}
+
+  /* ---------- 印章与页眉 ---------- */
+  .HWH_header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:26px clamp(20px,5vw,64px);
+    border-bottom:1px solid var(--HWH_hairline);
+  }
+  .HWH_brandBox{display:flex;align-items:center;gap:16px}
+  .HWH_seal{
+    width:52px;height:52px;background:var(--HWH_seal);color:var(--HWH_paper);
+    font-family:var(--HWH_kai);font-size:19px;line-height:1.15;
+    writing-mode:vertical-rl;text-align:center;
+    display:flex;align-items:center;justify-content:center;
+    letter-spacing:2px;box-shadow:inset 0 0 0 2px var(--HWH_paper),inset 0 0 0 3px var(--HWH_seal);
+  }
+  .HWH_brand{font-family:var(--HWH_song);font-size:20px;letter-spacing:6px}
+  .HWH_brand small{display:block;font-family:var(--HWH_didot);font-size:11px;letter-spacing:4px;font-style:italic;color:var(--HWH_klein)}
+  .HWH_nav{display:flex;gap:28px;font-size:14px}
+  .HWH_nav a{text-decoration:none;border-bottom:1px solid transparent;padding-bottom:2px}
+  .HWH_nav a:hover{border-color:var(--HWH_klein);color:var(--HWH_klein)}
+  .HWH_nav .HWH_here{color:var(--HWH_klein);border-color:var(--HWH_klein)}
+
+  /* ---------- 铸墨 hero ---------- */
+  .HWH_hero{
+    position:relative;text-align:center;overflow:hidden;
+    padding:clamp(64px,10vw,120px) 20px clamp(56px,8vw,96px);
+  }
+  .HWH_heroGlyph{
+    position:absolute;left:50%;top:50%;
+    transform:translate(-50%,-52%);
+    font-size:clamp(300px,52vw,620px);
+    color:var(--HWH_klein);opacity:.07;pointer-events:none;
+  }
+  .HWH_heroIn{position:relative}
+  .HWH_dynasty{
+    font-family:var(--HWH_kai);font-size:15px;color:var(--HWH_seal);
+    letter-spacing:8px;
+  }
+  .HWH_title{
+    font-family:var(--HWH_song);font-weight:400;
+    font-size:clamp(64px,11vw,128px);letter-spacing:.18em;
+    line-height:1.15;margin:10px 0 6px;text-indent:.18em;
+  }
+  .HWH_titleEn{
+    font-family:var(--HWH_didot);font-style:italic;font-size:clamp(15px,2vw,20px);
+    letter-spacing:3px;color:var(--HWH_klein);
+  }
+  .HWH_lede{
+    max-width:34em;margin:26px auto 0;font-size:15px;color:#4A463F;
+  }
+  .HWH_lede em{font-style:normal;color:var(--HWH_klein)}
+
+  /* ---------- 展区通用 ---------- */
+  .HWH_zone{padding:0 clamp(20px,5vw,64px) 90px}
+  .HWH_zoneHead{
+    display:flex;align-items:baseline;gap:18px;
+    border-top:1px solid var(--HWH_ink);
+    padding-top:14px;margin-bottom:8px;
+  }
+  .HWH_zoneHead h2{font-family:var(--HWH_song);font-weight:400;font-size:26px;letter-spacing:8px}
+  .HWH_zoneHead p{font-family:var(--HWH_kai);font-size:14px;color:#6B665D}
+  .HWH_zoneHead .HWH_en{margin-left:auto;font-family:var(--HWH_didot);font-style:italic;font-size:13px;color:var(--HWH_klein)}
+
+  /* ---------- 铸字盘 ---------- */
+  .HWH_caseGrid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));
+    border-top:1px solid var(--HWH_hairline);border-left:1px solid var(--HWH_hairline);
+  }
+  .HWH_cell{
+    appearance:none;background:none;border:none;cursor:pointer;
+    border-right:1px solid var(--HWH_hairline);border-bottom:1px solid var(--HWH_hairline);
+    aspect-ratio:1/1;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:10px;
+    color:var(--HWH_ink);transition:background .25s,color .25s;
+  }
+  .HWH_cell .HWH_glyph{font-size:30px}
+  .HWH_cell .HWH_code{font-family:var(--HWH_didot);font-size:12px;letter-spacing:.5px}
+  .HWH_cell .HWH_uni{font-family:var(--HWH_didot);font-style:italic;font-size:11px;color:#8A857A}
+  .HWH_cell:hover{background:var(--HWH_klein);color:var(--HWH_paper)}
+  .HWH_cell:hover .HWH_uni{color:rgba(237,236,231,.75)}
+
+  /* ---------- 字号阶梯 ---------- */
+  .HWH_ladder{
+    display:flex;align-items:flex-end;gap:clamp(18px,4vw,48px);
+    border-block:1px solid var(--HWH_hairline);
+    padding:44px 10px 30px;overflow-x:auto;
+  }
+  .HWH_step{text-align:center;color:var(--HWH_klein)}
+  .HWH_step i{display:block}
+  .HWH_step span{display:block;margin-top:12px;font-family:var(--HWH_didot);font-style:italic;font-size:12px;color:#8A857A}
+  .HWH_ladderNote{font-family:var(--HWH_kai);font-size:14px;color:#6B665D;margin-top:14px}
+
+  /* ---------- 品牌字坊 ---------- */
+  .HWH_brandRow{
+    display:flex;flex-wrap:wrap;gap:14px;justify-content:center;
+    padding:40px 0 8px;
+  }
+  .HWH_brandCell{
+    width:88px;height:88px;border:1px solid var(--HWH_hairline);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    font-size:30px;color:var(--HWH_ink);
+  }
+  .HWH_brandCell span{font-family:var(--HWH_didot);font-style:italic;font-size:11px;color:#8A857A}
+  .HWH_brandCell:hover{border-color:var(--HWH_klein);color:var(--HWH_klein)}
+
+  /* ---------- 用法 ---------- */
+  .HWH_usage{margin-top:26px}
+  .HWH_usageCode{
+    background:var(--HWH_ink);color:#D8D4CA;font-size:13.5px;line-height:2;
+    padding:26px 28px;overflow-x:auto;
+    font-family:Consolas,"Courier New",monospace;
+  }
+  .HWH_usageCode .HWH_tag{color:#8FA6E8}
+  .HWH_usageCode .HWH_str{color:#E0B089}
+
+  /* ---------- 页脚 ---------- */
+  .HWH_footer{
+    border-top:1px solid var(--HWH_ink);
+    padding:30px clamp(20px,5vw,64px) 44px;
+    display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;
+  }
+  .HWH_footer .HWH_colophon{font-family:var(--HWH_kai);font-size:13px;color:#6B665D}
+  .HWH_footerLinks{display:flex;gap:24px;font-size:14px}
+  .HWH_footerLinks a{text-decoration:none;border-bottom:1px solid var(--HWH_hairline);padding-bottom:2px}
+  .HWH_footerLinks a:hover{color:var(--HWH_klein);border-color:var(--HWH_klein)}
+
+  /* ---------- 复制回执 ---------- */
+  .HWH_toast{
+    position:fixed;left:50%;bottom:34px;transform:translate(-50%,16px);
+    background:var(--HWH_ink);color:var(--HWH_paper);
+    font-size:13px;letter-spacing:1px;padding:10px 22px;
+    opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;
+  }
+  .HWH_toast.HWH_show{opacity:1;transform:translate(-50%,0)}
+  .HWH_toast i{color:#E8B33C;margin-right:8px}
+
+  @media (max-width:640px){
+    .HWH_nav{display:none}
+    .HWH_title{letter-spacing:.1em;text-indent:.1em}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important;animation:none !important}
+  }
+</style>
+</head>
+<body>
+
+<header class="HWH_header">
+  <div class="HWH_brandBox">
+    <div class="HWH_seal" aria-hidden="true">HWH印</div>
+    <div class="HWH_brand">图标工坊<small>HWH Icon Atelier</small></div>
+  </div>
+  <nav class="HWH_nav">
+    <a href="index.html">首页</a>
+    <a class="HWH_here" href="iconfont-1.html">铸墨 · 字体图标</a>
+    <a href="iconfont-2.html">运线 · SVG 图标</a>
+  </nav>
+</header>
+
+<main>
+  <section class="HWH_hero">
+    <i class="fa-solid fa-pen-nib HWH_heroGlyph" aria-hidden="true"></i>
+    <div class="HWH_heroIn">
+      <p class="HWH_dynasty">第一展室 · 字体图标</p>
+      <h1 class="HWH_title">铸墨</h1>
+      <p class="HWH_titleEn">Cast in Type — Font Awesome 6</p>
+      <p class="HWH_lede">
+        每一枚图标都是一枚<em>铅字</em>：铸进字体文件，随文字排版，
+        由 <em>font-size</em> 定其大小，由 <em>color</em> 染其墨色。
+        下方字盘所陈，皆是可点击的活字——按下，即得类名。
+      </p>
+    </div>
+  </section>
+
+  <section class="HWH_zone">
+    <div class="HWH_zoneHead">
+      <h2>铸字盘</h2>
+      <p>点击任意活字，复制其类名</p>
+      <span class="HWH_en">the type case</span>
+    </div>
+    <div class="HWH_caseGrid" id="HWH_caseGrid">
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-house"><i class="fa-solid fa-house HWH_glyph"></i><span class="HWH_code">fa-house</span><span class="HWH_uni">f015</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-pen-nib"><i class="fa-solid fa-pen-nib HWH_glyph"></i><span class="HWH_code">fa-pen-nib</span><span class="HWH_uni">f5ae</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-palette"><i class="fa-solid fa-palette HWH_glyph"></i><span class="HWH_code">fa-palette</span><span class="HWH_uni">f53f</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-camera"><i class="fa-solid fa-camera HWH_glyph"></i><span class="HWH_code">fa-camera</span><span class="HWH_uni">f030</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-music"><i class="fa-solid fa-music HWH_glyph"></i><span class="HWH_code">fa-music</span><span class="HWH_uni">f001</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-heart"><i class="fa-solid fa-heart HWH_glyph"></i><span class="HWH_code">fa-heart</span><span class="HWH_uni">f004</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-star"><i class="fa-solid fa-star HWH_glyph"></i><span class="HWH_code">fa-star</span><span class="HWH_uni">f005</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-bolt"><i class="fa-solid fa-bolt HWH_glyph"></i><span class="HWH_code">fa-bolt</span><span class="HWH_uni">f0e7</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-fire"><i class="fa-solid fa-fire HWH_glyph"></i><span class="HWH_code">fa-fire</span><span class="HWH_uni">f06d</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-gear"><i class="fa-solid fa-gear HWH_glyph"></i><span class="HWH_code">fa-gear</span><span class="HWH_uni">f013</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-magnifying-glass"><i class="fa-solid fa-magnifying-glass HWH_glyph"></i><span class="HWH_code">fa-magnifying-glass</span><span class="HWH_uni">f002</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-envelope"><i class="fa-solid fa-envelope HWH_glyph"></i><span class="HWH_code">fa-envelope</span><span class="HWH_uni">f0e0</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-location-dot"><i class="fa-solid fa-location-dot HWH_glyph"></i><span class="HWH_code">fa-location-dot</span><span class="HWH_uni">f3c5</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-calendar-days"><i class="fa-solid fa-calendar-days HWH_glyph"></i><span class="HWH_code">fa-calendar-days</span><span class="HWH_uni">f133</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-clock"><i class="fa-solid fa-clock HWH_glyph"></i><span class="HWH_code">fa-clock</span><span class="HWH_uni">f017</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-cloud"><i class="fa-solid fa-cloud HWH_glyph"></i><span class="HWH_code">fa-cloud</span><span class="HWH_uni">f0c2</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-moon"><i class="fa-solid fa-moon HWH_glyph"></i><span class="HWH_code">fa-moon</span><span class="HWH_uni">f186</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-sun"><i class="fa-solid fa-sun HWH_glyph"></i><span class="HWH_code">fa-sun</span><span class="HWH_uni">f185</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-feather"><i class="fa-solid fa-feather HWH_glyph"></i><span class="HWH_code">fa-feather</span><span class="HWH_uni">f52b</span></button>
+      <button class="HWH_cell" type="button" data-HWH-copy="fa-solid fa-compass"><i class="fa-solid fa-compass HWH_glyph"></i><span class="HWH_code">fa-compass</span><span class="HWH_uni">f14e</span></button>
+    </div>
+  </section>
+
+  <section class="HWH_zone">
+    <div class="HWH_zoneHead">
+      <h2>字号阶梯</h2>
+      <p>字体图标随字号而长</p>
+      <span class="HWH_en">scale by font-size</span>
+    </div>
+    <div class="HWH_ladder">
+      <div class="HWH_step"><i class="fa-solid fa-star" style="font-size:1rem"></i><span>1rem</span></div>
+      <div class="HWH_step"><i class="fa-solid fa-star" style="font-size:1.5rem"></i><span>1.5rem</span></div>
+      <div class="HWH_step"><i class="fa-solid fa-star" style="font-size:2.25rem"></i><span>2.25rem</span></div>
+      <div class="HWH_step"><i class="fa-solid fa-star" style="font-size:3.25rem"></i><span>3.25rem</span></div>
+      <div class="HWH_step"><i class="fa-solid fa-star" style="font-size:4.5rem"></i><span>4.5rem</span></div>
+      <div class="HWH_step"><i class="fa-solid fa-star" style="font-size:6rem"></i><span>6rem</span></div>
+    </div>
+    <p class="HWH_ladderNote">图标即字符：设 font-size 一步到位，与行内文字天然对齐基线。</p>
+  </section>
+
+  <section class="HWH_zone">
+    <div class="HWH_zoneHead">
+      <h2>品牌字坊</h2>
+      <p>fa-brands 家族的知名印记</p>
+      <span class="HWH_en">brand workshop</span>
+    </div>
+    <div class="HWH_brandRow">
+      <div class="HWH_brandCell"><i class="fa-brands fa-github"></i><span>github</span></div>
+      <div class="HWH_brandCell"><i class="fa-brands fa-weixin"></i><span>weixin</span></div>
+      <div class="HWH_brandCell"><i class="fa-brands fa-html5"></i><span>html5</span></div>
+      <div class="HWH_brandCell"><i class="fa-brands fa-css3-alt"></i><span>css3</span></div>
+      <div class="HWH_brandCell"><i class="fa-brands fa-js"></i><span>js</span></div>
+      <div class="HWH_brandCell"><i class="fa-brands fa-git-alt"></i><span>git</span></div>
+      <div class="HWH_brandCell"><i class="fa-brands fa-figma"></i><span>figma</span></div>
+      <div class="HWH_brandCell"><i class="fa-brands fa-google"></i><span>google</span></div>
+    </div>
+  </section>
+
+  <section class="HWH_zone">
+    <div class="HWH_zoneHead">
+      <h2>用法</h2>
+      <p>两行起步</p>
+      <span class="HWH_en">how to use</span>
+    </div>
+    <pre class="HWH_usageCode"><code>&lt;<span class="HWH_tag">link</span> <span class="HWH_str">rel="stylesheet"</span> <span class="HWH_str">href="cdn/fontawesome/css/all.min.css"</span>&gt;
+
+&lt;<span class="HWH_tag">i</span> <span class="HWH_str">class="fa-solid fa-house"</span>&gt;&lt;/<span class="HWH_tag">i</span>&gt;   <span class="HWH_str">&lt;!-- 字体图标：一个字符，一种字体 --&gt;</span></code></pre>
+  </section>
+</main>
+
+<footer class="HWH_footer">
+  <p class="HWH_colophon">高级网页设计 · 图标专题 · 本地 CDN 已收录至 cdn 目录</p>
+  <div class="HWH_footerLinks">
+    <a href="index.html">返回首页</a>
+    <a href="iconfont-2.html">前往「运线」展 →</a>
+  </div>
+</footer>
+
+<div class="HWH_toast" id="HWH_toast" role="status"><i class="fa-solid fa-check"></i><span id="HWH_toastText"></span></div>
+
+<script>
+  var HWH_toast = document.getElementById('HWH_toast');
+  var HWH_toastText = document.getElementById('HWH_toastText');
+  var HWH_toastTimer = null;
+
+  function HWH_showToast(msg){
+    HWH_toastText.textContent = msg;
+    HWH_toast.classList.add('HWH_show');
+    clearTimeout(HWH_toastTimer);
+    HWH_toastTimer = setTimeout(function(){
+      HWH_toast.classList.remove('HWH_show');
+    }, 1800);
+  }
+
+  document.getElementById('HWH_caseGrid').addEventListener('click', function(HWH_e){
+    var HWH_cell = HWH_e.target.closest('.HWH_cell');
+    if(!HWH_cell) return;
+    var HWH_text = HWH_cell.getAttribute('data-HWH-copy');
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(HWH_text).then(function(){
+        HWH_showToast('已复制类名：' + HWH_text);
+      });
+    } else {
+      HWH_showToast('类名：' + HWH_text);
+    }
+  });
+</script>
+</body>
+</html>

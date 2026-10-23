@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抓小球游戏|函数的三个应用方法</title>
+    <style>
+        body {
+            font-size: 24px;
+            overflow: hidden;
+            background: #f0f8ff;
+        }
+        #info {
+            padding: 16px;
+            background: #222;
+            color: #fff;
+            position: relative;
+            z-index: 1;
+        }
+        .ball {
+            width: 50px;
+            height: 50px;
+            background: red;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">当前分数:<span id="score">0</span></div>
+    <div id="balls"></div>
+
+    <script>
+        // const是常量指的是变量的引用地址不能变，不是对象里的数据不能改
+        const game = {
+            score: 0,
+            ballContainer: document.getElementById('balls'),
+            ballDoms: [],
+            ballCount: 5,
+            width:50,
+            height:50,
+        };// 需要什么函数：小球随机位置，点击小球分数加一，点击空白位置减分，更新分数
+        function moveBall() {
+            // 获取浏览器窗口的宽高，减去小球的宽高，得到小球可以移动的最大范围
+            const columns = Math.max(1, Math.floor(window.innerWidth / game.width));
+            const rows = Math.max(1, Math.floor(window.innerHeight / game.height));
+            const positions = [];
+
+            // 生成随机位置
+            for (let row = 0; row < rows; row++) {
+                for (let column = 0; column < columns; column++) {
+                    positions.push({
+                        x: column * game.width,
+                        y: row * game.height
+                    });
+                }
+            }
+
+            for (let i = positions.length - 1; i > 0; i--) {
+                const randomIndex = Math.floor(Math.random() * (i + 1));
+                [positions[i], positions[randomIndex]] = [positions[randomIndex], positions[i]];
+            }
+
+            const ballCount = Math.min(game.ballCount, positions.length);
+            while (game.ballDoms.length < ballCount) {
+                const ballDom = document.createElement('div');
+                ballDom.className = 'ball';
+                game.ballContainer.appendChild(ballDom);
+                game.ballDoms.push(ballDom);
+                ballDom.addEventListener('click', function(e) {
+                    game.score+=1;
+                    updateScore();
+                    moveBall();
+                    // 阻止事件冒泡，避免触发body的miss扣分
+                    e.stopPropagation();
+                });
+            }
+            while (game.ballDoms.length > ballCount) {
+                game.ballDoms.pop().remove();
+            }
+
+            // 更新小球的位置
+            game.ballDoms.forEach(function(ballDom, index) {
+                ballDom.style.left = positions[index].x + 'px';
+                ballDom.style.top = positions[index].y + 'px';
+            });
+            //random范围是[0,maxX)和[0,maxY)
+        }
+        //更新分数
+        //普通的函数存在函数提升：函数体在后面，函数的调用在前面，函数体会被提升到最前面，所以可以正常调用
+        // 箭头函数没有函数提升，函数体在后面，函数的调用在前面，会报错
+        //有this，arguments：类数组对象，函数在调用的时候传递过来的实参
+       function updateScore(a,b) {
+            //function updateScore(a,b)
+            // a=arguments[0]
+            // b=arguments[1]
+            document.getElementById('score').innerText = game.score;
+        }
+        document.addEventListener('click', function(e) {
+            if (!(e.target instanceof Element) || !e.target.closest('.ball')) {
+                game.score-=1;
+                updateScore();
+            }
+        });
+        window.addEventListener('resize', function() {
+            moveBall();
+        });
+        moveBall();
+        window.setInterval(moveBall, 10000);
+    </script>
+</body>
+</html>

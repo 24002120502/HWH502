@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>铸墨 · 移动版 — 底部导航（字体图标）</title>
+<link rel="stylesheet" href="font/iconfont.css">
+<style>
+  :root{
+    --HWH_paper:#EDECE7;
+    --HWH_ink:#1B1814;
+    --HWH_klein:#0F2DB3;
+    --HWH_seal:#C03540;
+    --HWH_hairline:#BDB9AE;
+    --HWH_muted:#6B665D;
+    --HWH_song:"STSong","SimSun","NSimSun",serif;
+    --HWH_didot:"Didot","Bodoni MT","Playfair Display",Georgia,serif;
+    --HWH_kai:"KaiTi","STKaiti","FZKai-Z03S",serif;
+    --HWH_body:system-ui,"Segoe UI","Microsoft YaHei",sans-serif;
+    --HWH_barH:58px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    background:#DEDAD2;
+    color:var(--HWH_ink);
+    font-family:var(--HWH_body);
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  :focus-visible{outline:2px solid var(--HWH_klein);outline-offset:2px}
+  a{color:inherit}
+
+  /* ---------- 手机画布：桌面居中 480px，移动端满幅 ---------- */
+  .HWH_app{
+    position:relative;max-width:480px;margin:0 auto;
+    min-height:100vh;min-height:100dvh;
+    background:var(--HWH_paper);
+    border-inline:1px solid var(--HWH_hairline);
+    box-shadow:0 0 40px rgba(27,24,20,.12);
+  }
+
+  /* ---------- 应用栏 ---------- */
+  .HWH_appBar{
+    position:sticky;top:0;z-index:10;
+    display:flex;align-items:flex-end;justify-content:space-between;
+    padding:18px 20px 12px;
+    background:var(--HWH_paper);
+    border-bottom:1px solid var(--HWH_ink);
+  }
+  .HWH_appTitle{font-family:var(--HWH_song);font-size:24px;letter-spacing:6px;line-height:1.2}
+  .HWH_appTitle small{
+    display:block;font-family:var(--HWH_kai);font-size:11px;
+    letter-spacing:3px;color:var(--HWH_muted);
+  }
+  .HWH_homeLink{
+    font-size:12px;text-decoration:none;color:var(--HWH_muted);
+    border:1px solid var(--HWH_hairline);padding:5px 12px;letter-spacing:2px;
+  }
+  .HWH_homeLink:hover{color:var(--HWH_klein);border-color:var(--HWH_klein)}
+
+  /* ---------- 内容区 ---------- */
+  .HWH_main{padding:20px 20px calc(var(--HWH_barH) + env(safe-area-inset-bottom,0px) + 28px)}
+  .HWH_panel{display:none}
+  .HWH_panel.HWH_on{display:block}
+  .HWH_panelTitle{
+    font-family:var(--HWH_kai);font-size:13px;color:var(--HWH_muted);
+    letter-spacing:4px;margin-bottom:14px;
+  }
+  .HWH_panelTitle b{
+    font-family:var(--HWH_song);font-weight:400;color:var(--HWH_ink);
+    font-size:18px;letter-spacing:5px;margin-right:10px;
+  }
+
+  .HWH_card{
+    border:1px solid var(--HWH_hairline);
+    padding:14px 16px;margin-bottom:12px;background:rgba(255,255,255,.35);
+  }
+  .HWH_card h3{font-family:var(--HWH_song);font-weight:400;font-size:16px;letter-spacing:2px;line-height:1.5}
+  .HWH_card p{font-family:var(--HWH_kai);font-size:12.5px;color:var(--HWH_muted);margin-top:4px}
+  .HWH_card .HWH_meta{
+    display:flex;gap:14px;margin-top:8px;
+    font-family:var(--HWH_didot);font-style:italic;font-size:11px;color:#8A857A;
+  }
+
+  .HWH_searchBox{
+    display:flex;border:1px solid var(--HWH_ink);background:rgba(255,255,255,.5);
+  }
+  .HWH_searchBox .iconfont{font-size:18px;padding:10px 0 10px 14px;color:var(--HWH_klein)}
+  .HWH_searchBox input{
+    flex:1;border:none;background:none;padding:10px 14px;
+    font-family:var(--HWH_kai);font-size:14px;color:var(--HWH_ink);outline:none;
+  }
+  .HWH_searchBox input::placeholder{color:#A39E92}
+  .HWH_chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .HWH_chip{
+    font-family:var(--HWH_kai);font-size:13px;letter-spacing:1px;
+    border:1px solid var(--HWH_hairline);padding:6px 14px;cursor:pointer;background:none;
+  }
+  .HWH_chip:hover{border-color:var(--HWH_klein);color:var(--HWH_klein)}
+  .HWH_chip b{
+    font-family:var(--HWH_didot);font-weight:400;font-style:italic;
+    font-size:11px;color:var(--HWH_seal);margin-left:6px;
+  }
+
+  .HWH_note{
+    margin-top:22px;padding-top:14px;border-top:1px solid var(--HWH_hairline);
+    font-family:var(--HWH_kai);font-size:12px;color:var(--HWH_muted);
+    display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  }
+  .HWH_note a{text-decoration:none;color:var(--HWH_klein);border-bottom:1px solid var(--HWH_hairline)}
+
+  /* ---------- 底部导航：固定 · 自适应等分宽度 ---------- */
+  .HWH_tabBar{
+    position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+    width:min(100%,480px);z-index:20;
+    display:flex;align-items:stretch;
+    height:calc(var(--HWH_barH) + env(safe-area-inset-bottom,0px));
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    background:rgba(237,236,231,.92);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+    border-top:1px solid var(--HWH_ink);
+  }
+  .HWH_tab{
+    flex:1 1 0;min-width:0;
+    appearance:none;border:none;background:none;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    color:#8A857A;position:relative;
+    transition:color .2s;
+  }
+  .HWH_tab::before{ /* 选中指示：顶部墨条 */
+    content:"";position:absolute;top:-1px;left:50%;transform:translateX(-50%) scaleX(0);
+    width:26px;height:3px;background:var(--HWH_ink);
+    transition:transform .25s;transform-origin:center;
+  }
+  .HWH_tab.HWH_on{color:var(--HWH_klein)}
+  .HWH_tab.HWH_on::before{transform:translateX(-50%) scaleX(1)}
+  .HWH_tabIcon{position:relative;display:block;font-size:0}
+  .HWH_tabIcon .iconfont{font-size:22px;line-height:1}
+  .HWH_tabLabel{font-family:var(--HWH_kai);font-size:11px;letter-spacing:3px;line-height:1}
+
+  /* ---------- 徽章：数字 / 红点（图标右上角） ---------- */
+  .HWH_badge{
+    position:absolute;top:-7px;left:calc(50% + 5px);
+    min-width:17px;height:17px;padding:0 4px;
+    background:var(--HWH_seal);color:#fff;
+    font-family:var(--HWH_didot);font-style:italic;font-size:10px;font-weight:400;
+    line-height:17px;text-align:center;border-radius:9px;
+    border:1.5px solid var(--HWH_paper);
+  }
+  .HWH_dot{
+    position:absolute;top:-3px;left:calc(50% + 7px);
+    width:9px;height:9px;border-radius:50%;
+    background:var(--HWH_seal);border:1.5px solid var(--HWH_paper);
+  }
+
+  @media (max-width:480px){
+    body{background:var(--HWH_paper)}
+    .HWH_app{border-inline:none;box-shadow:none}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important;animation:none !important}
+  }
+</style>
+</head>
+<body>
+
+<div class="HWH_app">
+  <header class="HWH_appBar">
+    <div class="HWH_appTitle">铸墨<small>移动版 · 字体图标导航</small></div>
+    <a class="HWH_homeLink" href="index.html">返回首页</a>
+  </header>
+
+  <main class="HWH_main">
+    <section class="HWH_panel HWH_on" id="HWH_p-shipin">
+      <p class="HWH_panelTitle"><b>视频</b>正在放映的三部短片</p>
+      <article class="HWH_card">
+        <h3>克莱因蓝的诞生</h3>
+        <p>一块颜色如何成为一整个流派的签名。</p>
+        <div class="HWH_meta"><span>03'42"</span><span>1.2万 次播放</span></div>
+      </article>
+      <article class="HWH_card">
+        <h3>宋体排印九讲 · 第三讲</h3>
+        <p>横细竖粗之间，藏着刻工的刀法。</p>
+        <div class="HWH_meta"><span>12'08"</span><span>8632 次播放</span></div>
+      </article>
+      <article class="HWH_card">
+        <h3>活字盘复原记</h3>
+        <p>在数字时代重新铸造一套铅字。</p>
+        <div class="HWH_meta"><span>08'55"</span><span>2.4万 次播放</span></div>
+      </article>
+    </section>
+
+    <section class="HWH_panel" id="HWH_p-dizhi">
+      <p class="HWH_panelTitle"><b>地址</b>工坊与展室所在地</p>
+      <article class="HWH_card">
+        <h3>HWH 图标工坊（总坊）</h3>
+        <p>高级网页设计学院 · 设计楼 302 室</p>
+        <div class="HWH_meta"><span>周一至周五 09:00–18:00</span></div>
+      </article>
+      <article class="HWH_card">
+        <h3>「铸墨 · 运线」双联展</h3>
+        <p>学院美术馆 · 二层回廊展厅</p>
+        <div class="HWH_meta"><span>展至本学期末</span></div>
+      </article>
+    </section>
+
+    <section class="HWH_panel" id="HWH_p-baocun">
+      <p class="HWH_panelTitle"><b>保存</b>稍后再读的三篇</p>
+      <article class="HWH_card">
+        <h3>字体图标 vs SVG 图标</h3>
+        <p>一次选型笔记：渲染、无障碍与可维护性。</p>
+        <div class="HWH_meta"><span>阅读约 8 分钟</span></div>
+      </article>
+      <article class="HWH_card">
+        <h3>底部导航的六条准则</h3>
+        <p>拇指热区、四项上限与选中态的设计依据。</p>
+        <div class="HWH_meta"><span>阅读约 5 分钟</span></div>
+      </article>
+      <article class="HWH_card">
+        <h3>徽章设计的克制</h3>
+        <p>数字与红点何时该同时出现，何时不该。</p>
+        <div class="HWH_meta"><span>阅读约 4 分钟</span></div>
+      </article>
+    </section>
+
+    <section class="HWH_panel" id="HWH_p-sousuo">
+      <p class="HWH_panelTitle"><b>搜索</b>在工坊档案中检索</p>
+      <div class="HWH_searchBox">
+        <i class="iconfont icon-sousuo" aria-hidden="true"></i>
+        <input type="search" placeholder="输入关键词，如：图标 / 排印…" aria-label="搜索">
+      </div>
+      <div class="HWH_chips">
+        <button class="HWH_chip" type="button">iconfont<b>热</b></button>
+        <button class="HWH_chip" type="button">底部导航</button>
+        <button class="HWH_chip" type="button">宋体排印</button>
+        <button class="HWH_chip" type="button">SVG 描边</button>
+        <button class="HWH_chip" type="button">克莱因蓝<b>热</b></button>
+      </div>
+    </section>
+
+    <p class="HWH_note">
+      <span>iconfont 字体图标 · 本地 font 目录</span>
+      <a href="iconfont-4.html">SVG 版本 →</a>
+    </p>
+  </main>
+
+  <nav class="HWH_tabBar" id="HWH_tabBar" aria-label="底部导航">
+    <button class="HWH_tab HWH_on" type="button" data-HWH-tab="shipin">
+      <span class="HWH_tabIcon"><i class="iconfont icon-shipin"></i><b class="HWH_badge">6</b></span>
+      <span class="HWH_tabLabel">视频</span>
+    </button>
+    <button class="HWH_tab" type="button" data-HWH-tab="dizhi">
+      <span class="HWH_tabIcon"><i class="iconfont icon-dizhi"></i></span>
+      <span class="HWH_tabLabel">地址</span>
+    </button>
+    <button class="HWH_tab" type="button" data-HWH-tab="baocun">
+      <span class="HWH_tabIcon"><i class="iconfont icon-baocun"></i><b class="HWH_dot"></b></span>
+      <span class="HWH_tabLabel">保存</span>
+    </button>
+    <button class="HWH_tab" type="button" data-HWH-tab="sousuo">
+      <span class="HWH_tabIcon"><i class="iconfont icon-sousuo"></i><b class="HWH_badge">99+</b></span>
+      <span class="HWH_tabLabel">搜索</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+  var HWH_tabBar = document.getElementById('HWH_tabBar');
+
+  HWH_tabBar.addEventListener('click', function(HWH_e){
+    var HWH_tab = HWH_e.target.closest('.HWH_tab');
+    if(!HWH_tab) return;
+    var HWH_key = HWH_tab.getAttribute('data-HWH-tab');
+
+    document.querySelectorAll('.HWH_tab').forEach(function(HWH_t){
+      HWH_t.classList.toggle('HWH_on', HWH_t === HWH_tab);
+    });
+    document.querySelectorAll('.HWH_panel').forEach(function(HWH_p){
+      HWH_p.classList.toggle('HWH_on', HWH_p.id === 'HWH_p-' + HWH_key);
+    });
+
+    /* 已读即清除右上角徽章 / 红点 */
+    var HWH_mark = HWH_tab.querySelector('.HWH_badge, .HWH_dot');
+    if(HWH_mark) HWH_mark.remove();
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+</script>
+</body>
+</html>
