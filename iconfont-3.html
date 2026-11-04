@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- 作者：胡文豪 | 建立时间：2026-10-23 14:22:51 | 使用大模型：GLM-5.3-Flash | 功能名称：iconfont 字体图标移动端底部导航 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -268,6 +269,7 @@
 <script>
   var HWH_tabBar = document.getElementById('HWH_tabBar');
 
+  /* 功能：点击底部导航项切换内容面板，并清除对应数字徽章与红点 */
   HWH_tabBar.addEventListener('click', function(HWH_e){
     var HWH_tab = HWH_e.target.closest('.HWH_tab');
     if(!HWH_tab) return;

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<!-- 作者：胡文豪 | 建立时间：2026-11-04 13:42:26 | 使用大模型：GLM-5.3-Flash | 功能名称：新闻 Tab 选项卡 -->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>新闻 Tab 选项卡 - 胡文豪</title>
+  <style>
+    /* 页面基础 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      background: #eef2f7;
+      color: #24292f;
+      min-height: 100vh;
+      padding: 40px 16px;
+    }
+    .HWH_page { max-width: 720px; margin: 0 auto; }
+
+    .HWH_title { font-size: 26px; margin-bottom: 20px; color: #1f3a8a; }
+    .HWH_title small { display: block; font-size: 13px; color: #6b7280; font-weight: normal; margin-top: 6px; }
+
+    /* 选项卡组件（样式可复用） */
+    .HWH_tabGroup {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 14px rgba(31, 58, 138, .08);
+    }
+    .HWH_tabNav { display: flex; border-bottom: 1px solid #e2e8f0; }
+    .HWH_tabBtn {
+      flex: 1;
+      padding: 13px 8px;
+      font-size: 15px;
+      border: none;
+      background: #f8fafc;
+      color: #4b5563;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+    .HWH_tabBtn:hover { background: #e8eefc; color: #1f3a8a; }
+    .HWH_tabBtn.HWH_active {
+      background: #ffffff;
+      color: #1f3a8a;
+      font-weight: bold;
+      box-shadow: inset 0 -3px 0 #1f3a8a;
+    }
+
+    /* 内容面板：默认隐藏，选中显示 */
+    .HWH_panel { display: none; padding: 18px 22px; }
+    .HWH_panel.HWH_active { display: block; }
+
+    /* 新闻列表 */
+    .HWH_newsList { list-style: none; }
+    .HWH_newsList li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 4px;
+      border-bottom: 1px dashed #e5e7eb;
+      font-size: 15px;
+    }
+    .HWH_newsList li:last-child { border-bottom: none; }
+    .HWH_newsList a { color: #24292f; text-decoration: none; }
+    .HWH_newsList a:hover { color: #1f3a8a; text-decoration: underline; }
+    .HWH_newsList time { flex-shrink: 0; font-size: 12px; color: #9ca3af; }
+
+    /* 返回首页 */
+    .HWH_backHome {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 9px 22px;
+      border-radius: 6px;
+      background: #1f3a8a;
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .HWH_backHome:hover { background: #16296b; }
+  </style>
+</head>
+<body>
+  <main class="HWH_page">
+    <h1 class="HWH_title">新闻中心 Tab 选项卡
+      <small>点击选项卡切换新闻分类 · JS 外部引用 · 组件可复用</small>
+    </h1>
+
+    <!-- 选项卡容器：HWH_initTabs 可复用于页面中任意同类容器 -->
+    <div class="HWH_tabGroup" id="HWH_newsTabs">
+      <div class="HWH_tabNav">
+        <button class="HWH_tabBtn HWH_active" type="button">国内新闻</button>
+        <button class="HWH_tabBtn" type="button">省内新闻</button>
+        <button class="HWH_tabBtn" type="button">国际新闻</button>
+        <button class="HWH_tabBtn" type="button">最热新闻</button>
+      </div>
+
+      <div class="HWH_panel HWH_active">
+        <ul class="HWH_newsList">
+          <li><a href="#">全国秋粮收购全面展开，市场供应充足</a><time>2026-11-04</time></li>
+          <li><a href="#">我国成功发射新一代气象卫星</a><time>2026-11-03</time></li>
+          <li><a href="#">多地出台措施支持中小微企业数字化转型</a><time>2026-11-02</time></li>
+          <li><a href="#">全国铁路今起实行新列车运行图</a><time>2026-11-01</time></li>
+        </ul>
+      </div>
+
+      <div class="HWH_panel">
+        <ul class="HWH_newsList">
+          <li><a href="#">我省数字经济核心产业增加值稳步增长</a><time>2026-11-04</time></li>
+          <li><a href="#">省内高校产教融合基地正式揭牌</a><time>2026-11-03</time></li>
+          <li><a href="#">全省秋冬季大气污染防治攻坚行动启动</a><time>2026-11-02</time></li>
+          <li><a href="#">我省新增三条高速通车里程创新高</a><time>2026-11-01</time></li>
+        </ul>
+      </div>
+
+      <div class="HWH_panel">
+        <ul class="HWH_newsList">
+          <li><a href="#">多国代表呼吁加强全球气候合作</a><time>2026-11-04</time></li>
+          <li><a href="#">国际航天大会公布新一轮深空探测计划</a><time>2026-11-03</time></li>
+          <li><a href="#">全球能源转型报告发布，可再生能源占比提升</a><time>2026-11-02</time></li>
+          <li><a href="#">跨国铁路货运走廊运量创历史新高</a><time>2026-11-01</time></li>
+        </ul>
+      </div>
+
+      <div class="HWH_panel">
+        <ul class="HWH_newsList">
+          <li><a href="#">【热】全国秋粮收购全面展开，市场供应充足</a><time>2026-11-04</time></li>
+          <li><a href="#">【热】我省数字经济核心产业增加值稳步增长</a><time>2026-11-04</time></li>
+          <li><a href="#">【热】多国代表呼吁加强全球气候合作</a><time>2026-11-03</time></li>
+          <li><a href="#">【热】我国成功发射新一代气象卫星</a><time>2026-11-03</time></li>
+        </ul>
+      </div>
+    </div>
+
+    <a class="HWH_backHome" href="index.html">返回首页</a>
+  </main>
+
+  <!-- 外部引用 js 文件夹中的选项卡脚本 -->
+  <script src="js/HWH_tab.js"></script>
+  <script>
+    // 功能：初始化页面中的新闻选项卡组件
+    HWH_initTabs(document.getElementById('HWH_newsTabs'));
+  </script>
+</body>
+</html>

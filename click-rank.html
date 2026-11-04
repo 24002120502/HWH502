@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<!-- 作者：胡文豪 | 建立时间：2026-11-04 13:58:38 | 使用大模型：GLM-5.3-Flash | 功能名称：点击排行栏目（设计切片一比一还原） -->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>点击排行 - 一比一还原</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Microsoft YaHei", "SimSun", sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      min-height: 100vh;
+      padding: 40px 16px;
+    }
+    .HWH_page { width: 339px; margin: 0 auto; }
+
+    /* ===== 点击排行组件：与设计切片 1.jpg 一比一对应（339×370） ===== */
+    .HWH_rankBox {
+      width: 339px;
+      background: #fff;
+      border: 1px solid #ddd;
+      padding-bottom: 8px;
+    }
+
+    /* 标题栏：直接使用设计切片 tit06.jpg（300×33，含手形图标） */
+    .HWH_boxTitle { padding: 6px 0 4px 6px; }
+    .HWH_boxTitle img { display: block; }
+
+    /* 选项卡栏：选中项使用设计切片 lin.jpg（150×41，白底橙线带凹口） */
+    .HWH_tabNav { display: flex; border-bottom: 1px solid #e5e5e5; }
+    .HWH_tabBtn {
+      flex: 1;
+      height: 41px;
+      border: none;
+      background: #ececec;
+      color: #555;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    .HWH_tabBtn.HWH_active {
+      background: #fff url("images/rank/lin.jpg") no-repeat center bottom;
+      background-size: 100% 100%;
+      color: #e75c02;
+      font-weight: bold;
+    }
+
+    /* 排行列表（24小时排行，数据与效果图 1.jpg 一致） */
+    .HWH_rankList { list-style: none; padding: 4px 12px 0; }
+    .HWH_rankList li {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      height: 33px;
+      border-bottom: 1px dotted #e5e5e5;
+      font-size: 14px;
+    }
+    .HWH_rankList li:last-child { border-bottom: none; }
+    .HWH_rankList a {
+      flex: 1;
+      color: #333;
+      text-decoration: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 前三名数字徽章：使用设计切片 k.jpg（15×15 橙色方块），数字为橙色 */
+    .HWH_top3 {
+      flex-shrink: 0;
+      width: 15px;
+      height: 15px;
+      background: url("images/rank/k.jpg") no-repeat center / 100% 100%;
+      color: #e75c02;
+      font-size: 11px;
+      line-height: 15px;
+      text-align: center;
+    }
+    /* 第 4 名以后：无徽章，灰色数字 */
+    .HWH_rankPlain {
+      flex-shrink: 0;
+      width: 15px;
+      color: #999;
+      font-size: 12px;
+      text-align: center;
+    }
+    /* 点击量 */
+    .HWH_count { flex-shrink: 0; color: #999; font-size: 12px; }
+
+    /* 返回首页（项目规则要求） */
+    .HWH_backHome {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 9px 22px;
+      border-radius: 6px;
+      background: #e75c02;
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .HWH_backHome:hover { background: #c94d00; }
+  </style>
+</head>
+<body>
+  <main class="HWH_page">
+    <!-- 一比一还原：点击排行组件（仅效果图可见内容，无额外交互） -->
+    <div class="HWH_rankBox">
+      <!-- 标题：设计切片 tit06.jpg -->
+      <h2 class="HWH_boxTitle"><img src="images/rank/tit06.jpg" alt="点击排行"></h2>
+
+      <!-- 选项卡外观：24小时排行 为图中选中态 -->
+      <div class="HWH_tabNav">
+        <span class="HWH_tabBtn">实时点击</span>
+        <span class="HWH_tabBtn HWH_active">24小时排行</span>
+      </div>
+
+      <!-- 24小时排行列表 -->
+      <ul class="HWH_rankList">
+        <li><span class="HWH_top3">1</span><a href="#">灯塔水母：地球上唯一不死生物</a><span class="HWH_count">856322</span></li>
+        <li><span class="HWH_top3">2</span><a href="#">阿里巴巴全资收购UC 俞永福称U…</a><span class="HWH_count">311246</span></li>
+        <li><span class="HWH_top3">3</span><a href="#">亚马逊惊现三米长巨骨舌鱼用肺呼吸</a><span class="HWH_count">286883</span></li>
+        <li><span class="HWH_rankPlain">4</span><a href="#">奉化男子上山抓野味 遭遇极濒危动物</a><span class="HWH_count">266061</span></li>
+        <li><span class="HWH_rankPlain">5</span><a href="#">大白鲨深海失踪 或被大型生物猎食</a><span class="HWH_count">243936</span></li>
+        <li><span class="HWH_rankPlain">6</span><a href="#">南非小犀牛目睹母亲被猎杀不肯离开</a><span class="HWH_count">224346</span></li>
+        <li><span class="HWH_rankPlain">7</span><a href="#">余额宝周岁：收益率"过山车"</a><span class="HWH_count">172694</span></li>
+        <li><span class="HWH_rankPlain">8</span><a href="#">"尸油入餐桌"纯属无稽之谈</a><span class="HWH_count">128789</span></li>
+      </ul>
+    </div>
+
+    <a class="HWH_backHome" href="index.html">返回首页</a>
+  </main>
+</body>
+</html>

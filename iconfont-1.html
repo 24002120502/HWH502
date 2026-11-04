@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- 作者：胡文豪 | 建立时间：2026-10-23 13:58:49 | 使用大模型：GLM-5.3-Flash | 功能名称：Font Awesome 字体图标展示页 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -294,8 +295,9 @@
   var HWH_toastText = document.getElementById('HWH_toastText');
   var HWH_toastTimer = null;
 
-  function HWH_showToast(msg){
-    HWH_toastText.textContent = msg;
+  /* 功能：显示复制成功的轻提示，1.8 秒后自动隐藏 */
+  function HWH_showToast(HWH_msg){
+    HWH_toastText.textContent = HWH_msg;
     HWH_toast.classList.add('HWH_show');
     clearTimeout(HWH_toastTimer);
     HWH_toastTimer = setTimeout(function(){
@@ -303,6 +305,7 @@
     }, 1800);
   }
 
+  /* 功能：点击字盘格子，复制对应图标的类名 */
   document.getElementById('HWH_caseGrid').addEventListener('click', function(HWH_e){
     var HWH_cell = HWH_e.target.closest('.HWH_cell');
     if(!HWH_cell) return;
