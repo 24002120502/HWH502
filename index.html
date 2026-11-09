@@ -56,6 +56,24 @@
             opacity: 0.9;
         }
 
+        /* 提示词记录入口按钮 */
+        .HWH_prompt-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 9px 26px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            color: #fff;
+            font-size: 14px;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .HWH_prompt-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
         /* ===== 主体 ===== */
         .page-main {
             max-width: 960px;
@@ -176,7 +194,9 @@
     <header class="page-header">
         <span class="course">课堂实践</span>
         <h1>HWH ·《高级网页设计》</h1>
-        <p class="subtitle">本目录所有练习页面的导航入口 · 原生 HTML / CSS / JS，不依赖任何 CDN</p>
+        <p class="subtitle">本目录所有练习页面的导航入口 · 原生 HTML / CSS / JS 为主（Swiper 课例通过 CDN 引入组件库）</p>
+        <a class="HWH_prompt-link" href="HWH_docs.html#prompt">查看提示词记录 →</a>
+        <a class="HWH_prompt-link" href="HWH_docs.html#rules">查看规则记录 →</a>
     </header>
 
     <main class="page-main">
@@ -288,6 +308,24 @@
                         <span class="num">MODULE 12</span>
                         <h3>点击排行 · 切片还原</h3>
                         <p>按设计切片一比一还原新闻「点击排行」栏目，练习切图定位与 CSS 还原。</p>
+                        <span class="go">进入 →</span>
+                    </div>
+                </a>
+
+                <a href="swiper-task.html" class="card-link">
+                    <div class="card">
+                        <span class="num">MODULE 13</span>
+                        <h3>Swiper 轮播 · 课堂任务</h3>
+                        <p>大国重器光影展：四个轮播的 JS 初始化练习，涵盖拖动、圆点箭头、自动播放与六种切换效果。</p>
+                        <span class="go">进入 →</span>
+                    </div>
+                </a>
+
+                <a href="HWH_docs.html" class="card-link">
+                    <div class="card">
+                        <span class="num">MODULE 14</span>
+                        <h3>文档中心 · 提示词与规则</h3>
+                        <p>页面内直接排版阅读全部提示词记录与项目规则，无需下载 Markdown 文件。</p>
                         <span class="go">进入 →</span>
                     </div>
                 </a>

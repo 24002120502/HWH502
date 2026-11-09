@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<!-- 作者：胡文豪 | 建立时间：2026-11-06 14:50:09 | 使用大模型：DeepSeek-V4.1-Flash | 功能名称：文档查看页（渲染提示词记录与项目规则） -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HWH · 文档中心 · 提示词记录与项目规则</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f0f2f5;
+    color: #333;
+    line-height: 1.8;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  /* 页头 */
+  .HWH_head {
+    background: linear-gradient(135deg, #1e3a8a, #5b8def, #9b6bd6);
+    color: #fff;
+    padding: 44px 24px 58px;
+    text-align: center;
+  }
+
+  .HWH_head h1 {
+    font-size: 30px;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+  }
+
+  .HWH_head p {
+    font-size: 14px;
+    opacity: 0.9;
+  }
+
+  /* 主体容器 */
+  .HWH_main {
+    max-width: 900px;
+    margin: -30px auto 40px;
+    padding: 0 20px;
+  }
+
+  /* 切换栏 */
+  .HWH_tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .HWH_tab {
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14.5px;
+    padding: 10px 26px;
+    border-radius: 999px;
+    background: #fff;
+    color: #1e3a8a;
+    border: 1px solid #dbe4ff;
+    transition: all 0.2s;
+  }
+
+  .HWH_tab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(30, 58, 138, 0.16);
+  }
+
+  .HWH_tab.HWH_active {
+    background: linear-gradient(135deg, #1e3a8a, #5b8def);
+    color: #fff;
+    border-color: transparent;
+  }
+
+  /* 文档卡片 */
+  .HWH_panel {
+    display: none;
+    background: #fff;
+    border-radius: 14px;
+    padding: 28px 32px 34px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
+  }
+
+  .HWH_panel.HWH_active {
+    display: block;
+  }
+
+  .HWH_panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eef1f7;
+  }
+
+  .HWH_panel-head span {
+    font-size: 13px;
+    color: #8b95a7;
+  }
+
+  .HWH_raw {
+    display: block;
+    font-size: 13px;
+    color: #5b8def;
+    border: 1px solid #dbe4ff;
+    border-radius: 999px;
+    padding: 5px 16px;
+  }
+
+  .HWH_raw:hover {
+    background: #f2f6ff;
+  }
+
+  /* Markdown 渲染结果 */
+  .HWH_doc h1 {
+    font-size: 24px;
+    color: #1e3a8a;
+    margin: 6px 0 16px;
+  }
+
+  .HWH_doc h2 {
+    font-size: 18px;
+    color: #1e3a8a;
+    margin: 26px 0 12px;
+    padding-left: 12px;
+    border-left: 4px solid #5b8def;
+  }
+
+  .HWH_doc h3 {
+    font-size: 16px;
+    color: #333;
+    margin: 18px 0 8px;
+  }
+
+  .HWH_doc p {
+    font-size: 14.5px;
+    color: #444;
+    margin-bottom: 10px;
+  }
+
+  .HWH_doc .HWH_quote {
+    background: #f6f8fc;
+    border-left: 4px solid #9b6bd6;
+    padding: 10px 16px;
+    margin: 10px 0;
+    font-size: 14px;
+    color: #3f4a5c;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .HWH_doc ul {
+    margin: 8px 0 12px 22px;
+    font-size: 14px;
+  }
+
+  .HWH_doc li {
+    margin-bottom: 6px;
+  }
+
+  .HWH_doc hr {
+    border: none;
+    border-top: 1px dashed #d7dde8;
+    margin: 22px 0;
+  }
+
+  .HWH_doc strong {
+    color: #1e3a8a;
+  }
+
+  .HWH_doc pre {
+    background: #1e2533;
+    color: #e6edf7;
+    padding: 14px 18px;
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 12px 0;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .HWH_doc code.HWH_inline-code {
+    background: #eef2ff;
+    color: #1d4ed8;
+    padding: 1px 7px;
+    border-radius: 5px;
+    font-family: Consolas, monospace;
+    font-size: 13px;
+  }
+
+  .HWH_doc table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 13.5px;
+  }
+
+  .HWH_doc th,
+  .HWH_doc td {
+    border: 1px solid #e2e8f2;
+    padding: 9px 12px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .HWH_doc th {
+    background: #f2f6ff;
+    color: #1e3a8a;
+    white-space: nowrap;
+  }
+
+  /* 提示信息 */
+  .HWH_notice {
+    background: #fffbea;
+    border: 1px solid #fde68a;
+    color: #7c5e10;
+    font-size: 13.5px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    line-height: 1.9;
+  }
+
+  .HWH_notice code {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  /* 底部 */
+  .HWH_back {
+    text-align: center;
+    margin-top: 28px;
+  }
+
+  .HWH_back a {
+    display: inline-block;
+    background: #fff;
+    border: 1px solid #dbe4ff;
+    color: #1e3a8a;
+    font-size: 14.5px;
+    font-weight: bold;
+    padding: 10px 28px;
+    border-radius: 999px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .HWH_back a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(30, 58, 138, 0.15);
+  }
+
+  @media (max-width: 600px) {
+    .HWH_head { padding: 34px 18px 48px; }
+    .HWH_head h1 { font-size: 24px; }
+    .HWH_panel { padding: 22px 18px 26px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="HWH_head">
+  <h1>HWH · 文档中心</h1>
+  <p>提示词记录与项目规则 · 页面内直接阅读，无需下载 Markdown</p>
+</header>
+
+<main class="HWH_main">
+  <div class="HWH_tabs">
+    <button class="HWH_tab" id="HWH_tabPrompt" type="button">提示词记录</button>
+    <button class="HWH_tab" id="HWH_tabRules" type="button">项目规则</button>
+  </div>
+
+  <section class="HWH_panel" id="HWH_panelPrompt">
+    <div class="HWH_panel-head">
+      <strong>HWH_prompt.md · 全部提示词与执行情况</strong>
+      <a class="HWH_raw" href="HWH_prompt.md" target="_blank" rel="noopener">查看原文 →</a>
+    </div>
+    <div class="HWH_doc" id="HWH_docPrompt">正在读取……</div>
+  </section>
+
+  <section class="HWH_panel" id="HWH_panelRules">
+    <div class="HWH_panel-head">
+      <strong>HWH_rules.md · 长期生效的项目规则</strong>
+      <a class="HWH_raw" href="HWH_rules.md" target="_blank" rel="noopener">查看原文 →</a>
+    </div>
+    <div class="HWH_doc" id="HWH_docRules">正在读取……</div>
+  </section>
+
+  <div class="HWH_back"><a href="index.html">← 返回首页</a></div>
+</main>
+
+<script>
+  // 功能：转义 HTML 特殊字符，避免 Markdown 原文中的标签被浏览器当成真实标签执行
+  function HWH_escape(HWH_str) {
+    return HWH_str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  // 功能：处理行内语法（反引号代码与双星号加粗）
+  function HWH_inline(HWH_str) {
+    return HWH_escape(HWH_str)
+      .replace(/`([^`]+)`/g, '<code class="HWH_inline-code">$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  }
+
+  // 功能：把 Markdown 表格的多行文本转换为 HTML 表格，跳过第二行的分隔线
+  function HWH_buildTable(HWH_rows) {
+    var HWH_cells = HWH_rows.map(function (HWH_row) {
+      return HWH_row.replace(/^\|/, "").replace(/\|$/, "").split("|").map(function (HWH_c) {
+        return HWH_c.trim();
+      });
+    });
+    var HWH_html = [];
+    HWH_cells.forEach(function (HWH_row, HWH_index) {
+      if (HWH_index === 1) { return; }          // 跳过 | --- | --- | 分隔行
+      var HWH_tag = HWH_index === 0 ? "th" : "td";
+      HWH_html.push("<tr>" + HWH_row.map(function (HWH_c) {
+        return "<" + HWH_tag + ">" + HWH_inline(HWH_c) + "</" + HWH_tag + ">";
+      }).join("") + "</tr>");
+    });
+    return "<table>" + HWH_html.join("") + "</table>";
+  }
+
+  // 功能：逐行解析 Markdown 文本，输出可放入页面的 HTML 字符串（支持标题、表格、代码块、引用、列表、分隔线）
+  function HWH_mdToHtml(HWH_md) {
+    var HWH_lines = HWH_md.split(/\r?\n/);
+    var HWH_out = [];
+    var HWH_i = 0;
+
+    while (HWH_i < HWH_lines.length) {
+      var HWH_line = HWH_lines[HWH_i];
+
+      // 代码块 ``` 包裹的多行代码
+      if (/^```/.test(HWH_line)) {
+        var HWH_buf = [];
+        HWH_i++;
+        while (HWH_i < HWH_lines.length && !/^```/.test(HWH_lines[HWH_i])) {
+          HWH_buf.push(HWH_lines[HWH_i]);
+          HWH_i++;
+        }
+        HWH_i++;
+        HWH_out.push('<pre><code>' + HWH_escape(HWH_buf.join("\n")) + "</code></pre>");
+        continue;
+      }
+
+      // 表格：连续的 | 开头行
+      if (/^\|/.test(HWH_line)) {
+        var HWH_tableRows = [];
+        while (HWH_i < HWH_lines.length && /^\|/.test(HWH_lines[HWH_i])) {
+          HWH_tableRows.push(HWH_lines[HWH_i].trim());
+          HWH_i++;
+        }
+        HWH_out.push(HWH_buildTable(HWH_tableRows));
+        continue;
+      }
+
+      // 分隔线
+      if (/^---$/.test(HWH_line.trim())) {
+        HWH_out.push("<hr>");
+        HWH_i++;
+        continue;
+      }
+
+      // 标题 # / ## / ###
+      var HWH_head = HWH_line.match(/^(#{1,4})\s+(.*)$/);
+      if (HWH_head) {
+        var HWH_level = HWH_head[1].length;
+        HWH_out.push("<h" + HWH_level + ">" + HWH_inline(HWH_head[2]) + "</h" + HWH_level + ">");
+        HWH_i++;
+        continue;
+      }
+
+      // 引用块 > 开头，合并为一段
+      if (/^>\s?/.test(HWH_line)) {
+        var HWH_quoteLines = [];
+        while (HWH_i < HWH_lines.length && /^>\s?/.test(HWH_lines[HWH_i])) {
+          HWH_quoteLines.push(HWH_lines[HWH_i].replace(/^>\s?/, ""));
+          HWH_i++;
+        }
+        HWH_out.push('<div class="HWH_quote">' + HWH_inline(HWH_quoteLines.join(" ")) + "</div>");
+        continue;
+      }
+
+      // 无序列表 - 开头
+      if (/^- /.test(HWH_line)) {
+        var HWH_items = [];
+        while (HWH_i < HWH_lines.length && /^- /.test(HWH_lines[HWH_i])) {
+          HWH_items.push("<li>" + HWH_inline(HWH_lines[HWH_i].replace(/^- /, "")) + "</li>");
+          HWH_i++;
+        }
+        HWH_out.push("<ul>" + HWH_items.join("") + "</ul>");
+        continue;
+      }
+
+      // 空行
+      if (HWH_line.trim() === "") {
+        HWH_i++;
+        continue;
+      }
+
+      // 普通段落：连续非空且非特殊语法的行
+      var HWH_para = [];
+      while (HWH_i < HWH_lines.length &&
+             HWH_lines[HWH_i].trim() !== "" &&
+             !/^(#|\||>|- )/.test(HWH_lines[HWH_i]) &&
+             !/^```/.test(HWH_lines[HWH_i]) &&
+             !/^---$/.test(HWH_lines[HWH_i].trim())) {
+        HWH_para.push(HWH_lines[HWH_i]);
+        HWH_i++;
+      }
+      if (HWH_para.length) {
+        HWH_out.push("<p>" + HWH_inline(HWH_para.join(" ")) + "</p>");
+      } else {
+        HWH_i++;
+      }
+    }
+
+    return HWH_out.join("\n");
+  }
+
+  // 功能：读取指定的 Markdown 文件并渲染到对应容器；file:// 直开受浏览器安全限制时给出说明与原文入口
+  function HWH_loadDoc(HWH_file, HWH_target) {
+    fetch(HWH_file)
+      .then(function (HWH_res) {
+        if (!HWH_res.ok) { throw new Error("HTTP " + HWH_res.status); }
+        return HWH_res.text();
+      })
+      .then(function (HWH_text) {
+        HWH_target.innerHTML = HWH_mdToHtml(HWH_text);
+      })
+      .catch(function () {
+        HWH_target.innerHTML =
+          '<div class="HWH_notice">当前以本地文件方式（file://）直接打开，浏览器安全策略禁止读取同级文件。' +
+          "请点击上方「查看原文」按钮，或通过本地服务器访问本页" +
+          "（例如 <code>python -m http.server</code> 后打开 http://localhost:8000/HWH_docs.html）。</div>";
+      });
+  }
+
+  // 功能：切换两个文档面板的显示状态与按钮高亮
+  function HWH_switch(HWH_which) {
+    var HWH_isPrompt = HWH_which === "prompt";
+    document.getElementById("HWH_panelPrompt").classList.toggle("HWH_active", HWH_isPrompt);
+    document.getElementById("HWH_panelRules").classList.toggle("HWH_active", !HWH_isPrompt);
+    document.getElementById("HWH_tabPrompt").classList.toggle("HWH_active", HWH_isPrompt);
+    document.getElementById("HWH_tabRules").classList.toggle("HWH_active", !HWH_isPrompt);
+  }
+
+  // 功能：绑定两个切换按钮的点击事件
+  function HWH_bindTabs() {
+    document.getElementById("HWH_tabPrompt").addEventListener("click", function () {
+      HWH_switch("prompt");
+    });
+    document.getElementById("HWH_tabRules").addEventListener("click", function () {
+      HWH_switch("rules");
+    });
+  }
+
+  // 功能：页面初始化，按地址栏 hash 选中默认面板并加载两份文档
+  function HWH_init() {
+    HWH_bindTabs();
+    HWH_switch(location.hash === "#rules" ? "rules" : "prompt");
+    HWH_loadDoc("HWH_prompt.md", document.getElementById("HWH_docPrompt"));
+    HWH_loadDoc("HWH_rules.md", document.getElementById("HWH_docRules"));
+  }
+
+  HWH_init();
+</script>
+</body>
+</html>
