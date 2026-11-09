@@ -194,33 +194,36 @@
   <div class="wy-sec">
     <div class="wy-sec-head">
       <span class="wy-no">4</span>
-      <h2>六种效果随心换<small>effect 参数 + 进阶：按钮实时切换</small></h2>
+      <h2>七种效果随心换<small>effect 参数 + 进阶：按钮实时切换</small></h2>
     </div>
-    <p class="wy-txt">改一个 <code>effect</code> 参数，轮播立刻换一种"性格"：slide / fade / cube / coverflow / flip / cards。上面的 6 个按钮已经绑好了点击事件（读取 <code>btn.dataset.fx</code>），JS 还需要你补两段。</p>
+    <p class="wy-txt">改一个 <code>effect</code> 参数，轮播立刻换一种"性格"：slide / fade / cube / coverflow / flip / cards，以及课堂没讲的第 7 种 <code>creative</code>（自定义变换）。上面的 7 个按钮已经绑好了点击事件（读取 <code>btn.dataset.fx</code>），JS 还需要你补两段。</p>
     <div class="wy-req">
       <h3>✍️ 任务 4 要求</h3>
-      <p><b>基础分</b>：初始化 <code>#wySw4</code>，实现循环 + 自动播放（3.2 秒）+ 圆点分页器（#wyPag4），初始效果为 <code>'slide'</code>，动画时长 800 毫秒。</p>
+      <p><b>基础分</b>：初始化 <code>#wySw4</code>，实现循环 + 自动播放（3.2 秒）+ 圆点分页器（#wyPag4），初始效果为 <code>'cube'</code>，动画时长 800 毫秒。</p>
       <p><b>进阶分</b>：补全按钮点击事件中的 TODO——实现点击按钮<b>切换效果</b>。提示：Swiper 动态换 effect 不能只改参数，需要<b>先销毁旧实例再重建</b>（destroy + new）。</p>
       <span class="wy-star">⭐ 验证标准：基础分——轮播自动翻页；进阶分——点 cube 按钮变 3D 立方体、点 fade 变淡入淡出</span>
     </div>
     <div class="wy-fx">
-      <button class="wy-on" data-fx="slide">slide 平推（默认·稳重）</button>
+      <button class="wy-on" data-fx="cube">cube 3D 立方体（默认·炫酷）</button>
+      <button data-fx="slide">slide 平推（稳重）</button>
       <button data-fx="fade">fade 淡入淡出（优雅）</button>
-      <button data-fx="cube">cube 3D 立方体（炫酷）</button>
       <button data-fx="coverflow">coverflow 画廊堆叠（沉浸）</button>
       <button data-fx="flip">flip 翻页（复古）</button>
       <button data-fx="cards">cards 卡片（俏皮）</button>
+      <button data-fx="creative">creative 电影感（自定义）</button>
     </div>
+    <p class="wy-txt">💡 演示四已开启 <code>keyboard</code> 键盘控制：点击页面后按 ← / → 方向键即可切换（课堂未讲的超纲能力）。</p>
     <div class="wy-demo">
       <span class="wy-demo-tag">🎛️ 演示四 · 效果实验台（点按钮切换 effect）</span>
       <div class="wy-swiper">
         <div class="swiper" id="wySw4">
           <div class="swiper-wrapper">
             <div class="swiper-slide"><img src="swiper-imgs/tiangong_1.jpg" alt="天宫空间站"><div class="wy-cap"><h3>天宫空间站</h3><p>试试上面的效果按钮</p></div></div>
-            <div class="swiper-slide"><img src="swiper-imgs/fuxing_1.jpg" alt="复兴号动车组"><div class="wy-cap"><h3>复兴号动车组</h3><p>同一组照片，六种讲述方式</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/fuxing_1.jpg" alt="复兴号动车组"><div class="wy-cap"><h3>复兴号动车组</h3><p>同一组照片，七种讲述方式</p></div></div>
             <div class="swiper-slide"><img src="swiper-imgs/c919_1.jpg" alt="C919大飞机"><div class="wy-cap"><h3>C919 大飞机</h3><p>企业官网爱用 fade</p></div></div>
             <div class="swiper-slide"><img src="swiper-imgs/fendouzhe_1.jpg" alt="奋斗者号"><div class="wy-cap"><h3>奋斗者号</h3><p>游戏网站爱用 cube</p></div></div>
             <div class="swiper-slide"><img src="swiper-imgs/fast_1.jpg" alt="中国天眼"><div class="wy-cap"><h3>中国天眼 FAST</h3><p>相册页面爱用 coverflow</p></div></div>
+            <div class="swiper-slide"><img src="swiper-imgs/aita_magic_city.jpg" alt="爱达·魔都号"><div class="wy-cap"><h3>爱达·魔都号</h3><p>首艘国产大型邮轮 · 2024 年 1 月首航</p></div></div>
           </div>
           <div class="swiper-pagination" id="wyPag4"></div>
         </div>
@@ -270,13 +273,17 @@
   });
 
 
-  // ── 任务 4：初始化 #wySw4，循环 + 3.2 秒自动播放 + 圆点 + 初始 effect ──
+  // ── 任务 4：初始化 #wySw4，循环 + 3.2 秒自动播放 + 圆点 + 初始 effect cube ──
   // 功能：按指定的 effect 创建 #wySw4 轮播实例，其余配置保持统一，供初始化与重建复用
   function HWH_createSw4(HWH_effect) {
-    return new Swiper("#wySw4", {
+    // 公共配置：循环、800ms 动画、键盘方向键控制（超纲能力）、3.2 秒自动翻页且手动后不停、圆点可点
+    var HWH_opt = {
       loop: true,
       speed: 800,
       effect: HWH_effect,
+      keyboard: {
+        enabled: true,
+      },
       autoplay: {
         delay: 3200,
         disableOnInteraction: false,
@@ -285,13 +292,34 @@
         el: "#wyPag4",
         clickable: true,
       },
-    });
+    };
+
+    // 第 7 种效果 creative：课堂未讲，用 creativeEffect 自定义上/下一张的变换
+    if (HWH_effect === "creative") {
+      HWH_opt.creativeEffect = {
+        limitProgress: 2,
+        prev: {
+          // 上一张：缩小（translate 的 z 轴取负 = 推远）+ 向左移动 + 绕 z 轴倾斜 9 度
+          translate: ["-25%", 0, -180],
+          rotate: [0, 0, -9],
+          opacity: 0.85,
+        },
+        next: {
+          // 下一张：停在右侧屏外（x 轴 100%），z 轴取正 = 拉近放大，滑入时由大变小
+          translate: ["100%", 0, 40],
+          opacity: 0.7,
+        },
+      };
+    }
+
+    return new Swiper("#wySw4", HWH_opt);
   }
 
-  var HWH_sw4 = HWH_createSw4("slide");
+  // 三次课作业要求：初始效果为 cube
+  var HWH_sw4 = HWH_createSw4("cube");
 
 
-  // ── 任务 4 进阶：补全按钮点击事件，实现六种效果实时切换 ──
+  // ── 任务 4 进阶：补全按钮点击事件，实现七种效果实时切换 ──
   document.querySelectorAll('.wy-fx button').forEach(function(HWH_btn){
     // 功能：点击效果按钮时先高亮当前按钮，再销毁旧实例、按新 effect 重建轮播
     HWH_btn.addEventListener('click', function(){
