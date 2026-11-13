@@ -273,13 +273,14 @@
 
 <header class="HWH_head">
   <h1>HWH · 文档中心</h1>
-  <p>提示词记录与项目规则 · 页面内直接阅读，无需下载 Markdown</p>
+  <p>提示词记录 · 项目规则 · 答辩速查 · 页面内直接阅读，无需下载 Markdown</p>
 </header>
 
 <main class="HWH_main">
   <div class="HWH_tabs">
     <button class="HWH_tab" id="HWH_tabPrompt" type="button">提示词记录</button>
     <button class="HWH_tab" id="HWH_tabRules" type="button">项目规则</button>
+    <button class="HWH_tab" id="HWH_tabDefense" type="button">答辩速查</button>
   </div>
 
   <section class="HWH_panel" id="HWH_panelPrompt">
@@ -296,6 +297,14 @@
       <a class="HWH_raw" href="HWH_rules.md" target="_blank" rel="noopener">查看原文 →</a>
     </div>
     <div class="HWH_doc" id="HWH_docRules">正在读取……</div>
+  </section>
+
+  <section class="HWH_panel" id="HWH_panelDefense">
+    <div class="HWH_panel-head">
+      <strong>HWH_defense.md · Swiper 三次课作业答辩速查</strong>
+      <a class="HWH_raw" href="HWH_defense.md" target="_blank" rel="noopener">查看原文 →</a>
+    </div>
+    <div class="HWH_doc" id="HWH_docDefense">正在读取……</div>
   </section>
 
   <div class="HWH_back"><a href="index.html">← 返回首页</a></div>
@@ -450,31 +459,34 @@
       });
   }
 
-  // 功能：切换两个文档面板的显示状态与按钮高亮
+  // 功能：切换三个文档面板的显示状态与按钮高亮
   function HWH_switch(HWH_which) {
-    var HWH_isPrompt = HWH_which === "prompt";
-    document.getElementById("HWH_panelPrompt").classList.toggle("HWH_active", HWH_isPrompt);
-    document.getElementById("HWH_panelRules").classList.toggle("HWH_active", !HWH_isPrompt);
-    document.getElementById("HWH_tabPrompt").classList.toggle("HWH_active", HWH_isPrompt);
-    document.getElementById("HWH_tabRules").classList.toggle("HWH_active", !HWH_isPrompt);
+    ["prompt", "rules", "defense"].forEach(function (HWH_key) {
+      var HWH_cap = HWH_key.charAt(0).toUpperCase() + HWH_key.slice(1);
+      var HWH_on = HWH_key === HWH_which;
+      document.getElementById("HWH_panel" + HWH_cap).classList.toggle("HWH_active", HWH_on);
+      document.getElementById("HWH_tab" + HWH_cap).classList.toggle("HWH_active", HWH_on);
+    });
   }
 
-  // 功能：绑定两个切换按钮的点击事件
+  // 功能：绑定三个切换按钮的点击事件
   function HWH_bindTabs() {
-    document.getElementById("HWH_tabPrompt").addEventListener("click", function () {
-      HWH_switch("prompt");
-    });
-    document.getElementById("HWH_tabRules").addEventListener("click", function () {
-      HWH_switch("rules");
+    ["prompt", "rules", "defense"].forEach(function (HWH_key) {
+      var HWH_cap = HWH_key.charAt(0).toUpperCase() + HWH_key.slice(1);
+      document.getElementById("HWH_tab" + HWH_cap).addEventListener("click", function () {
+        HWH_switch(HWH_key);
+      });
     });
   }
 
-  // 功能：页面初始化，按地址栏 hash 选中默认面板并加载两份文档
+  // 功能：页面初始化，按地址栏 hash 选中默认面板并加载三份文档
   function HWH_init() {
     HWH_bindTabs();
-    HWH_switch(location.hash === "#rules" ? "rules" : "prompt");
+    var HWH_hash = location.hash.replace("#", "");
+    HWH_switch(HWH_hash === "rules" || HWH_hash === "defense" ? HWH_hash : "prompt");
     HWH_loadDoc("HWH_prompt.md", document.getElementById("HWH_docPrompt"));
     HWH_loadDoc("HWH_rules.md", document.getElementById("HWH_docRules"));
+    HWH_loadDoc("HWH_defense.md", document.getElementById("HWH_docDefense"));
   }
 
   HWH_init();

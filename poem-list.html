@@ -1,0 +1,156 @@
+<!--
+  作者：胡文豪
+  时间：2026-11-13
+  模型：Trae
+  功能名称：上图下文诗词卡片列表（从 Node.js 数据服务器读取 db.json）
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>诗词卡片 · 上图下文</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      background: linear-gradient(135deg, #f5f0e1 0%, #e8dcc4 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    .HWH_header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .HWH_header h1 {
+      color: #5d4037;
+      font-size: 32px;
+      letter-spacing: 4px;
+    }
+    .HWH_header p {
+      color: #8d6e63;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+    .HWH_back {
+      display: inline-block;
+      margin-top: 12px;
+      color: #6d4c41;
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .HWH_back:hover { text-decoration: underline; }
+
+    .HWH_container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 28px;
+    }
+
+    .HWH_card {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(93, 64, 55, 0.12);
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+    .HWH_card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 28px rgba(93, 64, 55, 0.22);
+    }
+    .HWH_card_img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background: #eee;
+      display: block;
+    }
+    .HWH_card_body {
+      padding: 18px 20px 22px;
+    }
+    .HWH_card_title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #4e342e;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+    .HWH_card_content {
+      font-size: 15px;
+      color: #6d4c41;
+      line-height: 1.8;
+    }
+
+    .HWH_loading, .HWH_error {
+      text-align: center;
+      color: #8d6e63;
+      padding: 60px 20px;
+      font-size: 16px;
+    }
+    .HWH_error { color: #c62828; }
+  </style>
+</head>
+<body>
+
+  <header class="HWH_header">
+    <h1>古 诗 词 鉴 赏</h1>
+    <p>数据来源：Node.js 服务器 (localhost:3004)</p>
+    <a href="index.html" class="HWH_back">← 返回首页</a>
+  </header>
+
+  <main class="HWH_container" id="HWH_cardContainer">
+    <div class="HWH_loading">正在加载数据...</div>
+  </main>
+
+  <script>
+    const HWH_API_BASE = 'http://localhost:3004';
+
+    /**
+     * 根据 pic 字段生成完整图片地址
+     * db.json 中 pic 为 /images/xxx.jpg，需拼上数据服务器前缀
+     */
+    function HWH_picUrl(pic) {
+      if (/^https?:\/\//.test(pic)) return pic;
+      return HWH_API_BASE + pic;
+    }
+
+    /**
+     * 从数据服务器获取 poems 列表并渲染为上图下文卡片
+     */
+    async function HWH_loadPoems() {
+      const container = document.getElementById('HWH_cardContainer');
+      try {
+        const res = await fetch(HWH_API_BASE + '/api/poems');
+        if (!res.ok) throw new Error('服务器响应异常');
+        const poems = await res.json();
+
+        if (!poems.length) {
+          container.innerHTML = '<div class="HWH_error">暂无数据</div>';
+          return;
+        }
+
+        container.innerHTML = poems.map(item => `
+          <article class="HWH_card">
+            <img class="HWH_card_img" src="${HWH_picUrl(item.pic)}" alt="${item.title}">
+            <div class="HWH_card_body">
+              <h2 class="HWH_card_title">${item.title}</h2>
+              <p class="HWH_card_content">${item.content}</p>
+            </div>
+          </article>
+        `).join('');
+      } catch (err) {
+        container.innerHTML = `
+          <div class="HWH_error">
+            加载失败：${err.message}<br>
+            <small>请先在 db 目录下运行 <code>node server.js</code></small>
+          </div>`;
+      }
+    }
+
+    HWH_loadPoems();
+  </script>
+
+</body>
+</html>

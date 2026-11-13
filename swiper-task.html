@@ -242,30 +242,48 @@
   // ══════════════════════════════════════════════════════════
 
   // ── 任务 1：初始化 #wySw1，让它至少可以拖动 ──
-  // 空配置对象即可让轮播可拖动
+  // new Swiper() → 创建轮播实例，第一个参数是轮播容器的 CSS 选择器
+  // "#wySw1" → 选中 HTML 里 id 为 wySw1 的 div
+  // {} → 空配置对象，不写任何选项，Switer 自带默认行为：手指/鼠标可以拖动切换
   var HWH_sw1 = new Swiper("#wySw1", {});
+
 
   // ── 任务 2：初始化 #wySw2，循环 + 600ms + 圆点可点 + 箭头切换 ──
   var HWH_sw2 = new Swiper("#wySw2", {
+    // loop: true → 开启"循环模式"，最后一张翻完后无缝回到第一张（效果：不会翻到最后就停住）
     loop: true,
+    // speed: 600 → 切换动画时长，单位毫秒，数值越大切换越慢越柔和
     speed: 600,
+    // pagination → 分页器配置，也就是底部那一排小圆点
     pagination: {
+      // el → 把分页器绑定到 HTML 里哪个元素上（HTML 中写了 <div id="wyPag2">）
       el: "#wyPag2",
+      // clickable: true → 让圆点可以"点击跳转"，默认 false 只能看不能点
       clickable: true,
     },
+    // navigation → 左右箭头按钮配置
     navigation: {
+      // nextEl → 右箭头（下一张按钮）的 DOM 元素 id（HTML 中写了 <div id="wyNext2">）
       nextEl: "#wyNext2",
+      // prevEl → 左箭头（上一张按钮）的 DOM 元素 id（HTML 中写了 <div id="wyPrev2">）
       prevEl: "#wyPrev2",
     },
   });
 
+
   // ── 任务 3：初始化 #wySw3，循环 + 2.6 秒自动翻页 + 拖动后不停 + 圆点 ──
   var HWH_sw3 = new Swiper("#wySw3", {
+    // loop: true → 同任务 2，无缝循环
     loop: true,
+    // autoplay → 自动播放配置，不写这个对象轮播是"静止"的，不会自己翻
     autoplay: {
+      // delay: 2600 → 每张 slide 停留多少毫秒后自动切下一张，2600ms = 2.6 秒
       delay: 2600,
+      // disableOnInteraction: false → 用户手动拖动/点击后，自动播放不会停止
+      // 默认是 true（交互一次就停了），任务 3 特意要求"拖完继续播"所以要写 false
       disableOnInteraction: false,
     },
+    // pagination → 同任务 2，绑定到 HTML 的 #wyPag3 元素，圆点可点
     pagination: {
       el: "#wyPag3",
       clickable: true,
@@ -273,66 +291,114 @@
   });
 
 
-  // ── 任务 4：初始化 #wySw4，循环 + 3.2 秒自动播放 + 圆点 + 初始 effect cube ──
-  // 功能：按指定的 effect 创建 #wySw4 轮播实例，其余配置保持统一，供初始化与重建复用
+  // ── 任务 4：初始化 #wySw4 ──
+  // 功能：封装一个函数，按传入的 effect 创建轮播实例，按钮切换时可以重复调用
+  // 截图分工任务 2：creative 仿写（creativeEffect 见下方 if 块）
+  // 截图分工任务 3：综合创作（keyboard 超纲能力）
   function HWH_createSw4(HWH_effect) {
-    // 公共配置：循环、800ms 动画、键盘方向键控制（超纲能力）、3.2 秒自动翻页且手动后不停、圆点可点
+    // HWH_effect → 形参，调用时传入 effect 名称（"slide" / "cube" / "creative" 等）
+
+    // 公共配置对象，所有 7 种效果共用这一套基础设置
     var HWH_opt = {
+      // loop: true → 无缝循环
       loop: true,
+      // speed: 800 → 切换动画 800ms，比任务 2/3 稍慢，效果更明显
       speed: 800,
+      // effect → 轮播效果类型，值来自函数参数 HWH_effect
+      // 可选值：slide（默认水平滑动）、fade（淡入淡出）、cube（立方体旋转）
+      //        coverflow（封面流）、flip（翻转）、cards（卡片叠放）、creative（自定义变换）
       effect: HWH_effect,
+      // keyboard → 键盘控制配置（截图分工任务 3 超纲能力，课堂未讲）
       keyboard: {
+        // enabled: true → 开启后按 ← → 方向键可切换轮播
         enabled: true,
       },
       autoplay: {
+        // delay: 3200 → 每 3.2 秒自动翻页
         delay: 3200,
+        // disableOnInteraction: false → 拖动后自动播放继续（同任务 3）
         disableOnInteraction: false,
       },
       pagination: {
+        // el → 绑定到 #wyPag4（注意：不能写 .swiper-pagination 全局类名，会串台）
         el: "#wyPag4",
+        // clickable: true → 圆点可点
         clickable: true,
       },
     };
 
-    // 第 7 种效果 creative：课堂未讲，用 creativeEffect 自定义上/下一张的变换
+    // ─── 截图分工任务 2：creative 仿写 ───
+    // 课堂只讲了 6 种 effect，creative 需要自己写 creativeEffect 配置
+    // creativeEffect → 用 transform 自定义"上一张"和"下一张"的进场/退场变换
+    // ★ 答辩抽问：改 rotate 第三个数能让卡片倾斜角度变，试试改成 20 度
     if (HWH_effect === "creative") {
+      // limitProgress: 2 → 同时最多允许几张 slide 应用 creative 变换效果
+      // 设 2 表示"上一张 + 当前张"都做变换，值越大越复杂，2 够用
       HWH_opt.creativeEffect = {
         limitProgress: 2,
+        // prev → 定义"上一张 slide 退场时"的 transform 变换
         prev: {
-          // 上一张：缩小（translate 的 z 轴取负 = 推远）+ 向左移动 + 绕 z 轴倾斜 9 度
+          // translate: [x, y, z] → 三维位移
+          // x="-25%" → 水平向左移动 slide 自身宽度的 25%
+          // y=0 → 垂直不移动
+          // z=-180 → z 轴向屏幕内推远 180px（视觉上变小）
           translate: ["-25%", 0, -180],
+          // rotate: [x轴, y轴, z轴] → 三维旋转（单位：度）
+          // x=0, y=0 → 不绕 x/y 轴转
+          // z=-9 → 绕 z 轴顺时针倾斜 9 度（负值=顺时针）
           rotate: [0, 0, -9],
+          // opacity: 0.85 → 退场时透明度 85%（略变暗，显得在远离）
           opacity: 0.85,
         },
+        // next → 定义"下一张 slide 进场前"的初始位置
         next: {
-          // 下一张：停在右侧屏外（x 轴 100%），z 轴取正 = 拉近放大，滑入时由大变小
+          // translate: [x, y, z]
+          // x="100%" → 水平停在右侧屏外（slide 自身宽度的 100% 处）
+          // z=40 → z 轴向屏幕外拉近 40px（视觉上比正常大），进场时会由大变小滑入
           translate: ["100%", 0, 40],
+          // opacity: 0.7 → 进场前透明度 70%
           opacity: 0.7,
         },
       };
     }
 
+    // return new Swiper() → 用配置好的 HWH_opt 创建实例并返回
+    // 这样外部可以拿到实例引用，用于 destroy 重建
     return new Swiper("#wySw4", HWH_opt);
   }
 
-  // 三次课作业要求：初始效果为 cube
+  // 三次课作业要求：初始效果为 cube（立方体旋转）
+  // 调用 HWH_createSw4("cube")，把函数返回的 Swiper 实例赋给 HWH_sw4
   var HWH_sw4 = HWH_createSw4("cube");
 
 
-  // ── 任务 4 进阶：补全按钮点击事件，实现七种效果实时切换 ──
+  // ── 任务 4 进阶：七种效果实时切换 ──
+  // document.querySelectorAll('.wy-fx button') → 选中所有 class="wy-fx" 里的 <button>
+  // 这些按钮在 HTML 里，每个按钮有 data-fx="cube" 这样的自定义属性，存着效果名
+  // .forEach() → 遍历每个按钮，给它们逐个绑定点击事件
   document.querySelectorAll('.wy-fx button').forEach(function(HWH_btn){
-    // 功能：点击效果按钮时先高亮当前按钮，再销毁旧实例、按新 effect 重建轮播
+    // HWH_btn → 当前遍历到的那个按钮元素
+    // addEventListener('click', fn) → 给按钮注册"点击"事件
     HWH_btn.addEventListener('click', function(){
-      // 高亮当前按钮：先清除其它按钮的选中态，再加上当前按钮
+      // ── 第一步：按钮高亮切换 ──
+      // 再遍历一次所有按钮，把选中态 wy-on 移除
       document.querySelectorAll('.wy-fx button').forEach(function(HWH_other){
+        // classList.remove('wy-on') → 从 HWH_other 的 class 里删掉 wy-on
         HWH_other.classList.remove('wy-on');
       });
+      // 给当前点击的按钮加上 wy-on，视觉上就高亮了
       HWH_btn.classList.add('wy-on');
 
-      // 销毁旧实例（动态改 effect 必须销毁后重建才生效）
+      // ── 第二步：销毁旧实例 ──
+      // HWH_sw4.destroy(true, true) → 销毁当前轮播实例
+      // 第一个参数 true → 同时解绑所有事件监听（防止旧实例还响应）
+      // 第二个参数 true → 同时移除 Swiper 注入的 DOM 类名和样式
+      // ★ 为什么要销毁？因为 effect 是初始化时定死的，不能中途改，必须销毁重建
       HWH_sw4.destroy(true, true);
 
-      // 用新 effect 重建实例，其它配置原样保留
+      // ── 第三步：用新 effect 重建 ──
+      // HWH_btn.dataset.fx → 读取按钮上 data-fx 属性的值（例如 "creative"、"flip"）
+      // 把这个值传给 HWH_createSw4，就创建出对应效果的新实例
       HWH_sw4 = HWH_createSw4(HWH_btn.dataset.fx);
     });
   });
