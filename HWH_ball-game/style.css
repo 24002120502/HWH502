@@ -110,3 +110,45 @@ body {
   background: radial-gradient(circle at 35% 30%, #6FA8F5, #1E6FE0 60%, #1557B0); /* 蓝色 + 高光立体感 */
   cursor: pointer;
 }
+
+/* ========== 飘字提示 ========== */
+.float-text {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 22px;
+  font-weight: bold;
+  pointer-events: none;   /* 不挡住点击，避免影响连续计分 */
+  z-index: 5;
+  animation: floatUp 0.6s ease-out forwards;
+}
+
+.float-text.plus {
+  color: #2ecc71;         /* 加分绿色 */
+}
+
+.float-text.minus {
+  color: #e74c3c;         /* 扣分红色 */
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -140%);  /* 向上飘动并渐隐 */
+  }
+}
+
+/* ========== 倒计时最后 10 秒告警 ========== */
+.info-value.warning {
+  color: #e74c3c;
+  animation: blink 1s step-start infinite;  /* 红色闪烁 */
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.2;
+  }
+}
