@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<!-- 作者：胡文豪 | 建立时间：2026-11-18 18:05:12 | 使用大模型：DeepSeek-V4.1-Flash | 功能名称：JSON→fetch 三档课堂任务合辑 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSON → fetch · 三档课堂任务 | HWH</title>
+<style>
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    margin: 0;
+    padding: 16px 14px 48px;
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: #f3f5f9;
+    color: #1f2937;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .HWH_back {
+    display: inline-block;
+    font-size: 14px;
+    color: #5b8def;
+    text-decoration: none;
+    margin-bottom: 14px;
+  }
+
+  .HWH_head h1 {
+    font-size: 21px;
+    margin: 0 0 6px;
+  }
+
+  .HWH_head p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0 0 16px;
+    line-height: 1.7;
+  }
+
+  /* ===== 顶部三个任务切换标签 ===== */
+  .HWH_tabs {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px 0;
+    background: #f3f5f9;
+  }
+
+  .HWH_tab {
+    flex: 0 0 auto;
+    border: 1px solid #d8dee9;
+    background: #fff;
+    color: #4b5563;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.25s ease;
+  }
+
+  .HWH_tab.HWH_on {
+    background: #5b8def;
+    border-color: #5b8def;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(91, 141, 239, 0.35);
+  }
+
+  /* ===== 任务面板 ===== */
+  .HWH_panel {
+    display: none;
+    background: #fff;
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .HWH_panel.HWH_on {
+    display: block;
+  }
+
+  .HWH_panel h2 {
+    font-size: 17px;
+    margin: 0 0 6px;
+    padding-left: 10px;
+    border-left: 4px solid #5b8def;
+  }
+
+  .HWH_panel .HWH_desc {
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.8;
+    margin: 0 0 14px;
+  }
+
+  .HWH_desc code {
+    background: #eef2ff;
+    color: #4338ca;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  /* ===== 操作条 ===== */
+  .HWH_bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .HWH_btn {
+    border: none;
+    background: #5b8def;
+    color: #fff;
+    font-size: 13px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .HWH_btn:hover {
+    background: #4a7be0;
+    transform: translateY(-1px);
+  }
+
+  .HWH_btn.HWH_gray {
+    background: #e5e7eb;
+    color: #4b5563;
+  }
+
+  .HWH_btn.HWH_gray:hover {
+    background: #d7dbe0;
+  }
+
+  .HWH_input {
+    flex: 1 1 200px;
+    min-width: 0;
+    border: 1px solid #d8dee9;
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 13px;
+    color: #1f2937;
+    outline: none;
+  }
+
+  .HWH_input:focus {
+    border-color: #5b8def;
+    box-shadow: 0 0 0 3px rgba(91, 141, 239, 0.15);
+  }
+
+  /* ===== 状态栏：成功 / 失败一眼可辨 ===== */
+  .HWH_status {
+    font-size: 13px;
+    line-height: 1.7;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #f8fafc;
+    border-left: 4px solid #cbd5e1;
+    color: #475569;
+    margin-bottom: 14px;
+    word-break: break-all;
+  }
+
+  .HWH_status.HWH_ok {
+    background: #ecfdf5;
+    border-left-color: #10b981;
+    color: #065f46;
+  }
+
+  .HWH_status.HWH_err {
+    background: #fef2f2;
+    border-left-color: #ef4444;
+    color: #991b1b;
+  }
+
+  /* ===== 诗词卡片网格 ===== */
+  .HWH_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 14px;
+  }
+
+  .HWH_card {
+    background: #fff;
+    border: 1px solid #eef1f5;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(31, 41, 55, 0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .HWH_card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 22px rgba(31, 41, 55, 0.14);
+  }
+
+  .HWH_card_img {
+    display: block;
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    background: #eef1f5;
+  }
+
+  .HWH_card_body {
+    padding: 12px 14px 16px;
+  }
+
+  .HWH_card_title {
+    font-size: 16px;
+    margin: 0 0 6px;
+    color: #111827;
+  }
+
+  .HWH_card_content {
+    font-size: 13px;
+    line-height: 1.8;
+    margin: 0;
+    color: #4b5563;
+  }
+
+  .HWH_empty,
+  .HWH_error {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.9;
+    padding: 40px 16px;
+    border-radius: 10px;
+  }
+
+  .HWH_empty {
+    color: #6b7280;
+    background: #f8fafc;
+    border: 1px dashed #d8dee9;
+  }
+
+  .HWH_error {
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+  }
+
+  .HWH_error small {
+    display: block;
+    margin-top: 6px;
+    color: #7f1d1d;
+    font-size: 12px;
+  }
+
+  /* ===== 任务二：作者标签 ===== */
+  .HWH_authors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .HWH_author {
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    color: #3730a3;
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .HWH_author b {
+    font-size: 13px;
+  }
+
+  .HWH_author small {
+    color: #6366f1;
+    margin-left: 4px;
+  }
+
+  .HWH_apiLinks {
+    font-size: 12.5px;
+    color: #6b7280;
+    margin: 0 0 14px;
+    line-height: 1.9;
+  }
+
+  .HWH_apiLinks a {
+    color: #2563eb;
+    text-decoration: none;
+    border-bottom: 1px dashed #93c5fd;
+  }
+
+  /* ===== 验收 / 答辩要点：显眼高亮卡片 ===== */
+  .HWH_qa {
+    margin-top: 18px;
+    padding: 14px 16px;
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-left: 5px solid #f59e0b;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(245, 158, 11, 0.15);
+  }
+
+  .HWH_qa-title {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: bold;
+    color: #fff;
+    background: #f59e0b;
+    padding: 3px 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+
+  .HWH_qa ul {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 13.5px;
+    color: #374151;
+    line-height: 1.95;
+  }
+
+  .HWH_qa li {
+    margin-bottom: 6px;
+  }
+
+  .HWH_qa b {
+    color: #b45309;
+  }
+
+  .HWH_qa code {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  @media (max-width: 480px) {
+    .HWH_panel {
+      padding: 14px 12px;
+    }
+
+    .HWH_grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <a class="HWH_back" href="index.html">← 返回首页</a>
+
+  <header class="HWH_head">
+    <h1>从 JSON 到 fetch · 三档课堂任务</h1>
+    <p>完整数据链路：db/db.json → Express（localhost:3004）→ fetch → JSON 解析 → 页面渲染。
+      体验前请先在 db 文件夹执行 <code>node server.js</code>。</p>
+  </header>
+
+  <!-- 三个任务的切换标签 -->
+  <div class="HWH_tabs">
+    <button class="HWH_tab HWH_on" data-target="HWH_task1">任务一 · 跑通全链路 ⭐</button>
+    <button class="HWH_tab" data-target="HWH_task2">任务二 · 数据我来定 ⭐⭐</button>
+    <button class="HWH_tab" data-target="HWH_task3">任务三 · 交互与答辩 ⭐⭐⭐</button>
+  </div>
+
+  <!-- ═══════════ 任务一 ═══════════ -->
+  <section class="HWH_panel HWH_on" id="HWH_task1">
+    <h2>任务一 · 跑通全链路 ⭐</h2>
+    <p class="HWH_desc">启动 <code>server.js</code>，用 fetch 取回诗词并渲染成"上图下文"卡片。
+      验收方式是<b>关闭服务器再刷新</b>：页面必须给出提示而不是白屏，所以 catch 分支一定要写。</p>
+
+    <div class="HWH_bar">
+      <button class="HWH_btn" id="HWH_btn_load1">fetch 加载诗词</button>
+      <button class="HWH_btn HWH_gray" id="HWH_btn_clear1">清空</button>
+    </div>
+
+    <div class="HWH_status" id="HWH_status1">点击「fetch 加载诗词」发起请求 👇</div>
+    <div class="HWH_grid" id="HWH_list1"></div>
+
+    <div class="HWH_qa">
+      <span class="HWH_qa-title">验收要点 · 考核点</span>
+      <ul>
+        <li>验收：<b>关闭服务器再刷新</b>，页面显示错误提示（不白屏），说明 catch 分支已写</li>
+        <li>考核点：<b>fetch 两段式</b>——第一次拿到响应对象，第二次 <code>.json()</code> 才解析出数组</li>
+        <li>考核点：<b>错误处理</b>——<code>.catch</code> 或 <code>try...catch</code> 必须写</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══════════ 任务二 ═══════════ -->
+  <section class="HWH_panel" id="HWH_task2">
+    <h2>任务二 · 数据我来定 ⭐⭐</h2>
+    <p class="HWH_desc">db.json 已新增 2 条诗词（共 6 条）；server.js 已增加 <code>/api/authors</code> 接口。
+      本关用 <code>Promise.all</code> 一次并发取回两份数据。</p>
+
+    <p class="HWH_apiLinks">
+      接口自检：
+      <a href="http://localhost:3004/api/poems" target="_blank">打开 /api/poems ↗</a>
+      &nbsp;|&nbsp;
+      <a href="http://localhost:3004/api/authors" target="_blank">打开 /api/authors ↗</a>
+    </p>
+
+    <div class="HWH_bar">
+      <button class="HWH_btn" id="HWH_btn_load2">Promise.all 并发请求</button>
+      <button class="HWH_btn HWH_gray" id="HWH_btn_clear2">清空</button>
+    </div>
+
+    <div class="HWH_status" id="HWH_status2">两个接口：/api/poems 与 /api/authors 👇</div>
+    <div class="HWH_authors" id="HWH_authors2"></div>
+    <div class="HWH_grid" id="HWH_list2"></div>
+
+    <div class="HWH_qa">
+      <span class="HWH_qa-title">验收要点 · 考核点</span>
+      <ul>
+        <li>验收：两个接口地址在浏览器直接打开，都能返回正确的 JSON</li>
+        <li>验收：页面用 <code>Promise.all</code> 同时取回两份数据，一次并发、不是串行等待</li>
+        <li>考核点：<b>数据结构设计</b> + <b>多接口 / 并发请求</b></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══════════ 任务三 ═══════════ -->
+  <section class="HWH_panel" id="HWH_task3">
+    <h2>任务三 · 加交互 + 现场答辩 ⭐⭐⭐</h2>
+    <p class="HWH_desc">搜索框按<b>标题或内容</b>实时过滤；「按标题长度排序」在升序 / 降序之间切换。
+      <b>过滤与排序都基于已取回的数据，不重新请求接口。</b></p>
+
+    <div class="HWH_bar">
+      <input class="HWH_input" id="HWH_search" type="text" placeholder="输入关键字：标题或内容">
+      <button class="HWH_btn" id="HWH_btn_sort">按标题长度排序</button>
+      <button class="HWH_btn HWH_gray" id="HWH_btn_load3">加载数据</button>
+    </div>
+
+    <div class="HWH_status" id="HWH_status3">先加载数据，再输入关键字实时过滤 👇</div>
+    <div class="HWH_grid" id="HWH_list3"></div>
+
+    <div class="HWH_qa">
+      <span class="HWH_qa-title">答辩四问 · 必须讲清</span>
+      <ul>
+        <li><b>Q1 为什么 fetch 要写两个 then？</b><br>
+          第一个 then 拿到的是响应对象（响应头），第二个 then 里 <code>res.json()</code> 才真正读取并解析响应体。</li>
+        <li><b>Q2 .json() 之前拿到的是什么？</b><br>
+          是 Response 对象（含 status、headers），不是数据本身。</li>
+        <li><b>Q3 CORS 是谁拦的？</b><br>
+          浏览器同源策略拦截；服务器返回 <code>Access-Control-Allow-Origin</code> 才能放行。</li>
+        <li><b>Q4 服务器没启动，页面表现如何？</b><br>
+          fetch 直接 reject，catch 捕获后显示错误提示，页面不白屏。</li>
+      </ul>
+    </div>
+  </section>
+
+  <script>
+    /* 数据服务器基础地址（db/server.js 监听 3004） */
+    var HWH_API_BASE = 'http://localhost:3004';
+
+    /* 任务三缓存：保存已取回的诗词，后续过滤 / 排序不再请求接口 */
+    var HWH_cachePoems = [];
+
+    /* 任务三排序状态：0 = 原顺序，1 = 标题长度升序，2 = 标题长度降序 */
+    var HWH_sortMode = 0;
+
+    /* 防止搜索框连续输入时重复发起请求 */
+    var HWH_loading3 = false;
+
+    /**
+     * 把 db.json 中的 /images/xx.jpg 补成服务器上的完整图片地址
+     */
+    function HWH_picUrl(pic) {
+      if (!pic) return '';
+      if (/^https?:\/\//.test(pic)) return pic;
+      return HWH_API_BASE + pic;
+    }
+
+    /**
+     * 统一设置状态栏文字与样式，kind 取 '' / 'ok' / 'err'
+     */
+    function HWH_setStatus(el, text, kind) {
+      el.textContent = text;
+      el.className = 'HWH_status' + (kind ? ' HWH_' + kind : '');
+    }
+
+    /**
+     * 把诗词数组渲染成"上图下文"卡片；空数组时给出提示
+     */
+    function HWH_renderPoems(box, list) {
+      if (!list || !list.length) {
+        box.innerHTML = '<div class="HWH_empty">没有匹配的诗词，换个关键字试试。</div>';
+        return;
+      }
+      box.innerHTML = list.map(function (item) {
+        return '<article class="HWH_card">' +
+          '<img class="HWH_card_img" src="' + HWH_picUrl(item.pic) + '" alt="' + item.title + '">' +
+          '<div class="HWH_card_body">' +
+          '<h3 class="HWH_card_title">' + item.title + '</h3>' +
+          '<p class="HWH_card_content">' + item.content + '</p>' +
+          '</div></article>';
+      }).join('');
+    }
+
+    /**
+     * 任务一：fetch 两段式加载全部诗词；失败时进入 catch，给出提示而不是白屏
+     */
+    async function HWH_loadTask1() {
+      var box = document.getElementById('HWH_list1');
+      var status = document.getElementById('HWH_status1');
+      HWH_setStatus(status, '正在请求 ' + HWH_API_BASE + '/api/poems ...', '');
+
+      try {
+        var resp = await fetch(HWH_API_BASE + '/api/poems');
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        var poems = await resp.json();
+
+        HWH_renderPoems(box, poems);
+        HWH_setStatus(status, '✅ 已取到 ' + poems.length + ' 条诗词（第一段拿响应，第二段 .json() 解析）', 'ok');
+      } catch (err) {
+        box.innerHTML = '<div class="HWH_error">加载失败：' + err.message +
+          '<small>请先在 db 文件夹执行 node server.js，看到"数据服务器已启动"后再刷新。</small></div>';
+        HWH_setStatus(status, '❌ 请求失败，已进入 catch 分支——页面没有白屏', 'err');
+      }
+    }
+
+    /**
+     * 任务二：Promise.all 同时请求诗词与作者两个接口，再分别渲染
+     */
+    async function HWH_loadTask2() {
+      var listBox = document.getElementById('HWH_list2');
+      var authorBox = document.getElementById('HWH_authors2');
+      var status = document.getElementById('HWH_status2');
+      HWH_setStatus(status, 'Promise.all 正在并发请求 /api/poems 与 /api/authors ...', '');
+
+      try {
+        var results = await Promise.all([
+          fetch(HWH_API_BASE + '/api/poems').then(function (r) {
+            if (!r.ok) throw new Error('poems HTTP ' + r.status);
+            return r.json();
+          }),
+          fetch(HWH_API_BASE + '/api/authors').then(function (r) {
+            if (!r.ok) throw new Error('authors HTTP ' + r.status);
+            return r.json();
+          })
+        ]);
+
+        var poems = results[0];
+        var authors = results[1];
+
+        authorBox.innerHTML = authors.map(function (a) {
+          return '<span class="HWH_author"><b>' + a.name + '</b><small>' + a.dynasty + ' · ' + a.title + '</small></span>';
+        }).join('');
+        HWH_renderPoems(listBox, poems);
+
+        HWH_setStatus(status, '✅ Promise.all 一次返回 2 份数据：poems ' + poems.length + ' 条 / authors ' + authors.length + ' 位', 'ok');
+      } catch (err) {
+        authorBox.innerHTML = '';
+        listBox.innerHTML = '<div class="HWH_error">加载失败：' + err.message +
+          '<small>请确认 db/server.js 已启动，且已包含 /api/authors 接口。</small></div>';
+        HWH_setStatus(status, '❌ 并发请求失败：' + err.message, 'err');
+      }
+    }
+
+    /**
+     * 任务三：首次取回诗词并写入缓存；后续过滤 / 排序都直接用缓存
+     */
+    async function HWH_loadTask3() {
+      if (HWH_loading3) return;
+      HWH_loading3 = true;
+
+      var status = document.getElementById('HWH_status3');
+      HWH_setStatus(status, '正在请求 ' + HWH_API_BASE + '/api/poems ...', '');
+
+      try {
+        var resp = await fetch(HWH_API_BASE + '/api/poems');
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        HWH_cachePoems = await resp.json();
+        HWH_applyFilter();
+      } catch (err) {
+        document.getElementById('HWH_list3').innerHTML =
+          '<div class="HWH_error">加载失败：' + err.message +
+          '<small>请先在 db 文件夹执行 node server.js。</small></div>';
+        HWH_setStatus(status, '❌ 请求失败：' + err.message, 'err');
+      } finally {
+        HWH_loading3 = false;
+      }
+    }
+
+    /**
+     * 任务三：按关键字过滤（标题或内容包含即命中），再按当前排序模式重排并渲染
+     * 数据来自缓存，不发生新的网络请求
+     */
+    function HWH_applyFilter() {
+      var status = document.getElementById('HWH_status3');
+      var box = document.getElementById('HWH_list3');
+
+      if (!HWH_cachePoems.length) {
+        box.innerHTML = '<div class="HWH_empty">还没有数据，请先点「加载数据」。</div>';
+        HWH_setStatus(status, '缓存为空，请先加载数据。', '');
+        return;
+      }
+
+      var keyword = document.getElementById('HWH_search').value.trim();
+      var result = HWH_cachePoems.filter(function (item) {
+        if (!keyword) return true;
+        return item.title.indexOf(keyword) > -1 || item.content.indexOf(keyword) > -1;
+      });
+
+      if (HWH_sortMode === 1) {
+        result.sort(function (a, b) { return a.title.length - b.title.length; });
+      } else if (HWH_sortMode === 2) {
+        result.sort(function (a, b) { return b.title.length - a.title.length; });
+      }
+
+      HWH_renderPoems(box, result);
+
+      var msg = '共 ' + HWH_cachePoems.length + ' 条，当前显示 ' + result.length + ' 条';
+      if (keyword) msg += '，关键字「' + keyword + '」';
+      if (HWH_sortMode === 1) msg += '，已按标题长度升序';
+      if (HWH_sortMode === 2) msg += '，已按标题长度降序';
+      msg += ' · 本次过滤未重新请求接口';
+      HWH_setStatus(status, msg, 'ok');
+    }
+
+    /**
+     * 任务三：在 原顺序 → 标题长度升序 → 标题长度降序 之间循环，并同步按钮文字
+     */
+    function HWH_toggleSort() {
+      HWH_sortMode = (HWH_sortMode + 1) % 3;
+
+      var btn = document.getElementById('HWH_btn_sort');
+      if (HWH_sortMode === 0) btn.textContent = '按标题长度排序';
+      if (HWH_sortMode === 1) btn.textContent = '标题长度：短 → 长';
+      if (HWH_sortMode === 2) btn.textContent = '标题长度：长 → 短';
+
+      HWH_applyFilter();
+    }
+
+    /**
+     * 任务切换：点击标签显示对应面板，其余面板隐藏
+     */
+    document.querySelectorAll('.HWH_tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        document.querySelectorAll('.HWH_tab').forEach(function (t) {
+          t.classList.remove('HWH_on');
+        });
+        document.querySelectorAll('.HWH_panel').forEach(function (p) {
+          p.classList.remove('HWH_on');
+        });
+        tab.classList.add('HWH_on');
+        document.getElementById(tab.dataset.target).classList.add('HWH_on');
+      });
+    });
+
+    /* 任务一：加载 / 清空 */
+    document.getElementById('HWH_btn_load1').addEventListener('click', HWH_loadTask1);
+    document.getElementById('HWH_btn_clear1').addEventListener('click', function () {
+      document.getElementById('HWH_list1').innerHTML = '';
+      HWH_setStatus(document.getElementById('HWH_status1'), '已清空，可重新点击加载。', '');
+    });
+
+    /* 任务二：并发加载 / 清空 */
+    document.getElementById('HWH_btn_load2').addEventListener('click', HWH_loadTask2);
+    document.getElementById('HWH_btn_clear2').addEventListener('click', function () {
+      document.getElementById('HWH_list2').innerHTML = '';
+      document.getElementById('HWH_authors2').innerHTML = '';
+      HWH_setStatus(document.getElementById('HWH_status2'), '已清空，可重新点击并发请求。', '');
+    });
+
+    /* 任务三：加载 / 排序 / 搜索实时过滤 */
+    document.getElementById('HWH_btn_load3').addEventListener('click', HWH_loadTask3);
+    document.getElementById('HWH_btn_sort').addEventListener('click', HWH_toggleSort);
+    document.getElementById('HWH_search').addEventListener('input', function () {
+      if (!HWH_cachePoems.length) {
+        /* 还没加载过数据时，先取一次再过滤 */
+        HWH_loadTask3();
+        return;
+      }
+      HWH_applyFilter();
+    });
+  </script>
+
+</body>
+</html>

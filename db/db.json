@@ -1,23 +1,42 @@
 {
   "poems": [
-  {
-    "content": "你看是不是变了！",
-    "pic": "/images/6.jpg",
-    "title": "短歌行"
-  },
-  {
-    "content": "雨前初见花间蕊，雨后全无叶底花。",
-    "pic": "/images/2.jpg",
-    "title": "雨晴"
-  },
-  {
-    "content": "花近高楼伤客心，万方多难此登临。",
-    "pic": "/images/3.jpg",
-    "title": "脊楼"
-  },
-  {
-    "content": "纤云弄巧，飞星传恨，银汉迢迢暗度。",
-    "pic": "/images/4.jpg",
-    "title": "鹊桥仙·纤云弄巧"
-  }
-]}
+    {
+      "title": "短歌行",
+      "content": "你看是不是变了！",
+      "pic": "/images/6.jpg"
+    },
+    {
+      "title": "雨晴",
+      "content": "雨前初见花间蕊，雨后全无叶底花。",
+      "pic": "/images/2.jpg"
+    },
+    {
+      "title": "脊楼",
+      "content": "花近高楼伤客心，万方多难此登临。",
+      "pic": "/images/3.jpg"
+    },
+    {
+      "title": "鹊桥仙·纤云弄巧",
+      "content": "纤云弄巧，飞星传恨，银汉迢迢暗度。",
+      "pic": "/images/4.jpg"
+    },
+    {
+      "title": "静夜思",
+      "content": "床前明月光，疑是地上霜。举头望明月，低头思故乡。",
+      "pic": "/images/1.jpg"
+    },
+    {
+      "title": "登鹳雀楼",
+      "content": "白日依山尽，黄河入海流。欲穷千里目，更上一层楼。",
+      "pic": "/images/5.jpg"
+    }
+  ],
+  "authors": [
+    { "name": "曹操", "dynasty": "东汉", "title": "短歌行" },
+    { "name": "王驾", "dynasty": "唐代", "title": "雨晴" },
+    { "name": "杜甫", "dynasty": "唐代", "title": "脊楼" },
+    { "name": "秦观", "dynasty": "宋代", "title": "鹊桥仙·纤云弄巧" },
+    { "name": "李白", "dynasty": "唐代", "title": "静夜思" },
+    { "name": "王之涣", "dynasty": "唐代", "title": "登鹳雀楼" }
+  ]
+}

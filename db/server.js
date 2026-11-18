@@ -46,6 +46,27 @@ app.get('/api/poems', (req, res) => {
   });
 });
 
+/**
+ * GET /api/authors
+ * 返回 db.json 中 authors 数组（课堂任务二：多接口并发请求）
+ */
+app.get('/api/authors', (req, res) => {
+  const dbPath = path.join(__dirname, 'db.json');
+  fs.readFile(dbPath, 'utf-8', (err, data) => {
+    if (err) {
+      res.status(500).json({ error: '读取 db.json 失败' });
+      return;
+    }
+    try {
+      const json = JSON.parse(data);
+      res.json(json.authors || []);
+    } catch (e) {
+      res.status(500).json({ error: 'db.json 格式错误' });
+    }
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`数据服务器已启动: http://localhost:${PORT}/api/poems`);
+  console.log(`作者接口: http://localhost:${PORT}/api/authors`);
 });
