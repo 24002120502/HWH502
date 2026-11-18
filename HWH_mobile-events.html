@@ -320,6 +320,33 @@
     color: #6b7280;
   }
 
+  /* 任务三、任务四的操作演示视频窗口 */
+  .HWH_videoBox {
+    margin-top: 18px;
+    text-align: center;
+  }
+
+  .HWH_videoTitle {
+    font-size: 13px;
+    font-weight: bold;
+    color: #374151;
+    padding-left: 8px;
+    border-left: 3px solid #5b8def;
+    margin-bottom: 8px;
+    text-align: left;
+  }
+
+  .HWH_video {
+    /* width:auto + max-height 让竖屏视频按比例缩，不再撑满整屏 */
+    display: block;
+    width: auto;
+    max-width: 100%;
+    max-height: 380px;
+    margin: 0 auto;
+    border-radius: 12px;
+    background: #000;
+  }
+
   /* ===== 任务四：摇一摇 ===== */
   .HWH_sensorBox {
     text-align: center;
@@ -439,6 +466,16 @@
 
   <div class="HWH_scaleBar">当前缩放：<b id="HWH_scaleText">1.00</b> 倍</div>
 
+  <!-- 操作演示视频窗口 -->
+  <div class="HWH_videoBox">
+    <div class="HWH_videoTitle">操作演示</div>
+    <video class="HWH_video" id="HWH_demoVideo"
+           src="HWH_media/HWH_task3-demo.mp4"
+           controls playsinline webkit-playsinline preload="metadata">
+      你的浏览器不支持 video 标签，请升级浏览器。
+    </video>
+  </div>
+
   <div class="HWH_qa">
     <div class="HWH_qa-title">验收要点</div>
     <ul>
@@ -460,6 +497,16 @@
     <div class="HWH_magLine">合成加速度：<b id="HWH_mag">0.0</b>（阈值 18）</div>
     <button class="HWH_btn" id="HWH_permBtn">iOS 请先点这里授权</button>
     <button class="HWH_btn HWH_gray" id="HWH_pickBtn">点我抽一次（降级方案）</button>
+  </div>
+
+  <!-- 操作演示视频窗口 -->
+  <div class="HWH_videoBox">
+    <div class="HWH_videoTitle">操作演示</div>
+    <video class="HWH_video" id="HWH_shakeVideo"
+           src="HWH_media/HWH_task4-demo.mp4"
+           controls playsinline webkit-playsinline preload="metadata">
+      你的浏览器不支持 video 标签，请升级浏览器。
+    </video>
   </div>
 
   <div class="HWH_qa">
