@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<!--
+  作者：胡文豪
+  时间：2026-11-18
+  模型：DeepSeek-V4.1-Flash
+  功能名称：移动端触摸事件 · 四关任务合辑（HWH_mobile-events.html）
+  内容：任务一 事件侦探 / 任务二 手势卡片 / 任务三 图片查看器 / 任务四 摇一摇彩蛋
+  说明：全部基于原生 touch / devicemotion 事件，请用手机或浏览器设备模式体验
+-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>移动端触摸事件 · 四关任务 | HWH</title>
+<style>
+  /* 全局去掉移动端点击灰块 */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: 16px 14px 48px;
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: #f3f5f9;
+    color: #1f2937;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .HWH_back {
+    display: inline-block;
+    font-size: 14px;
+    color: #5b8def;
+    text-decoration: none;
+    margin-bottom: 14px;
+  }
+
+  .HWH_head h1 {
+    font-size: 21px;
+    margin: 0 0 6px;
+  }
+
+  .HWH_head p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0 0 16px;
+    line-height: 1.7;
+  }
+
+  /* ===== 顶部四个任务切换标签 ===== */
+  .HWH_tabs {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px 0;
+    background: #f3f5f9;
+  }
+
+  .HWH_tab {
+    flex: 0 0 auto;
+    border: 1px solid #d8dee9;
+    background: #fff;
+    color: #4b5563;
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.25s ease;
+  }
+
+  .HWH_tab.HWH_on {
+    background: #5b8def;
+    border-color: #5b8def;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(91, 141, 239, 0.35);
+  }
+
+  /* ===== 任务面板 ===== */
+  .HWH_panel {
+    display: none;
+    background: #fff;
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .HWH_panel.HWH_on {
+    display: block;
+  }
+
+  .HWH_panel h2 {
+    font-size: 17px;
+    margin: 0 0 6px;
+    padding-left: 10px;
+    border-left: 4px solid #5b8def;
+  }
+
+  .HWH_panel .HWH_desc {
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.7;
+    margin: 0 0 14px;
+  }
+
+  /* ===== 回答/验收要点：显眼的提示块 ===== */
+  .HWH_qa {
+    margin-top: 18px;
+    padding: 14px 16px;
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-left: 5px solid #f59e0b;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(245, 158, 11, 0.15);
+  }
+
+  .HWH_qa-title {
+    /* 标题做成实心色块，一眼就能扫到 */
+    display: inline-block;
+    font-size: 13px;
+    font-weight: bold;
+    color: #fff;
+    background: #f59e0b;
+    padding: 3px 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+
+  .HWH_qa ul {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 13.5px;
+    color: #374151;
+    line-height: 1.95;
+  }
+
+  .HWH_qa li {
+    margin-bottom: 3px;
+  }
+
+  .HWH_qa b {
+    color: #b45309;
+  }
+
+  /* ===== 任务一：事件探针 ===== */
+  .HWH_probe {
+    height: 200px;
+    border-radius: 12px;
+    background: #151022;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.9;
+    /* 手势归自己，避免页面滚动打断坐标 */
+    touch-action: none;
+    user-select: none;
+  }
+
+  .HWH_statbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+  }
+
+  .HWH_stat {
+    flex: 1 1 90px;
+    background: #f3f5f9;
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .HWH_stat b {
+    display: block;
+    font-size: 18px;
+    color: #1f2937;
+    margin-top: 2px;
+  }
+
+  .HWH_log {
+    height: 190px;
+    overflow-y: auto;
+    border-radius: 10px;
+    background: #0f172a;
+    color: #7ee2b8;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 12px;
+    line-height: 1.9;
+    padding: 10px 12px;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .HWH_btn {
+    border: none;
+    background: #5b8def;
+    color: #fff;
+    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 12px;
+  }
+
+  .HWH_btn.HWH_gray {
+    background: #e5e7eb;
+    color: #4b5563;
+  }
+
+  /* ===== 任务二：手势卡片 ===== */
+  .HWH_swipeBox {
+    /* 只接管横向手势，纵向仍可滚动页面 */
+    touch-action: pan-y;
+    user-select: none;
+    padding: 4px;
+    cursor: grab;
+  }
+
+  .HWH_foodCard {
+    height: 190px;
+    border-radius: 14px;
+    padding: 18px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    background: linear-gradient(135deg, #e8590c, #f08c00);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  /* 底部四个圆点：一眼看出共有 4 张 */
+  .HWH_dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .HWH_dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #d1d5db;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .HWH_dot.HWH_on {
+    width: 22px;
+    border-radius: 4px;
+    background: #5b8def;
+  }
+
+  .HWH_foodCard h3 {
+    font-size: 20px;
+    margin: 0 0 6px;
+  }
+
+  .HWH_foodCard p {
+    font-size: 13px;
+    margin: 0;
+    opacity: 0.92;
+  }
+
+  .HWH_foodFoot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    font-size: 13px;
+    color: #6b7280;
+  }
+
+  .HWH_tip {
+    color: #e8590c;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .HWH_tip.HWH_show {
+    opacity: 1;
+  }
+
+  /* ===== 任务三：图片查看器 ===== */
+  .HWH_viewer {
+    height: 260px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #000;
+    /* 手势全部接管，页面不缩放不滚动 */
+    touch-action: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  .HWH_viewer img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform-origin: center center;
+    will-change: transform;
+  }
+
+  .HWH_scaleBar {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #6b7280;
+  }
+
+  /* ===== 任务四：摇一摇 ===== */
+  .HWH_sensorBox {
+    text-align: center;
+    padding: 18px 10px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 2px dashed #d8dee9;
+  }
+
+  .HWH_dish {
+    font-size: 26px;
+    font-weight: bold;
+    color: #e8590c;
+    margin: 12px 0;
+    min-height: 40px;
+  }
+
+  .HWH_dish.HWH_pop {
+    animation: HWH_pop 0.4s ease;
+  }
+
+  @keyframes HWH_pop {
+    0% { transform: scale(0.6); opacity: 0; }
+    70% { transform: scale(1.12); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+
+  .HWH_magLine {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<a class="HWH_back" href="index.html">← 返回首页</a>
+
+<div class="HWH_head">
+  <h1>移动端触摸事件 · 四关任务</h1>
+  <p>按下、滑动、双指缩放、摇一摇——四个任务装在一个页面里。<br>建议用手机打开，或按 F12 开启设备模式。</p>
+</div>
+
+<!-- 四个任务切换标签 -->
+<div class="HWH_tabs">
+  <button class="HWH_tab HWH_on" data-target="HWH_panel1">任务一 · 事件侦探</button>
+  <button class="HWH_tab" data-target="HWH_panel2">任务二 · 手势卡片</button>
+  <button class="HWH_tab" data-target="HWH_panel3">任务三 · 图片查看器</button>
+  <button class="HWH_tab" data-target="HWH_panel4">任务四 · 摇一摇</button>
+</div>
+
+<!-- 任务一面板 -->
+<section class="HWH_panel HWH_on" id="HWH_panel1">
+  <h2>任务一 · 事件侦探</h2>
+  <p class="HWH_desc">在下方黑色区域依次做 5 种操作，观察事件触发顺序：<b>touchstart → touchmove×N → touchend → click</b>。</p>
+
+  <div class="HWH_probe" id="HWH_probe">
+    <div>用手指在这里<br>按下 · 拖动 · 抬起</div>
+  </div>
+
+  <div class="HWH_statbar">
+    <div class="HWH_stat">touchstart<b id="HWH_c_start">0</b></div>
+    <div class="HWH_stat">touchmove<b id="HWH_c_move">0</b></div>
+    <div class="HWH_stat">touchend<b id="HWH_c_end">0</b></div>
+    <div class="HWH_stat">touchcancel<b id="HWH_c_cancel">0</b></div>
+    <div class="HWH_stat">click<b id="HWH_c_click">0</b></div>
+  </div>
+
+  <div class="HWH_log" id="HWH_log">等待你的第一次触摸……</div>
+  <button class="HWH_btn HWH_gray" id="HWH_clearLog">清空日志</button>
+
+  <div class="HWH_qa">
+    <div class="HWH_qa-title">观察要点</div>
+    <ul>
+      <li>一次拖动里 <b>touchmove</b> 会触发很多次，移动距离越大次数越多</li>
+      <li><b>click</b> 出现在 <b>touchend 之后</b>，不是之前</li>
+      <li>来电或通知打断时触发的是 <b>touchcancel</b>，而不是 touchend</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 任务二面板 -->
+<section class="HWH_panel" id="HWH_panel2">
+  <h2>任务二 · 手势卡片</h2>
+  <p class="HWH_desc">共 4 道菜，在卡片上左右滑动切换。手机用手指滑，电脑可按住鼠标拖动，也能直接点下方圆点。</p>
+
+  <div class="HWH_swipeBox" id="HWH_swipeBox">
+    <div class="HWH_foodCard" id="HWH_foodCard">
+      <h3 id="HWH_foodName">麻婆豆腐</h3>
+      <p id="HWH_foodDesc">麻辣鲜香，川菜的灵魂</p>
+    </div>
+    <div class="HWH_foodFoot">
+      <span id="HWH_foodCount">第 1 / 4 张</span>
+      <span class="HWH_tip" id="HWH_swipeTip"></span>
+    </div>
+    <div class="HWH_dots" id="HWH_dots"></div>
+  </div>
+
+  <div class="HWH_qa">
+    <div class="HWH_qa-title">验收要点</div>
+    <ul>
+      <li>位移小于 <b>40px</b> 判为误触，不切换卡片</li>
+      <li>连续快速滑动不会一次跳两张（<b>300ms 冷却</b>）</li>
+      <li>容器用 <b>touch-action: pan-y</b>，纵向仍可滚动页面</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 任务三面板 -->
+<section class="HWH_panel" id="HWH_panel3">
+  <h2>任务三 · 图片查看器</h2>
+  <p class="HWH_desc">双指缩放 1~4 倍 · 双击在 1x/2x 之间切换 · 放大后可单指拖动查看细节。</p>
+
+  <div class="HWH_viewer" id="HWH_viewer">
+    <img id="HWH_zoomImg" src="swiper-imgs/aita_magic_city.jpg" alt="爱达·魔都号">
+  </div>
+
+  <div class="HWH_scaleBar">当前缩放：<b id="HWH_scaleText">1.00</b> 倍</div>
+
+  <div class="HWH_qa">
+    <div class="HWH_qa-title">验收要点</div>
+    <ul>
+      <li>缩放以<b>两指中点</b>为基准，图片不会“跳走”</li>
+      <li>缩放到 <b>1x 自动回到居中</b>，不会留下偏移</li>
+      <li>放大后拖动<b>不越界</b>，边缘有边界限制</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 任务四面板 -->
+<section class="HWH_panel" id="HWH_panel4">
+  <h2>任务四 · 摇一摇彩蛋</h2>
+  <p class="HWH_desc">摇一摇手机，随机抽一道今日菜谱。没有传感器时用按钮降级。</p>
+
+  <div class="HWH_sensorBox">
+    <div id="HWH_sensorState">摇一摇手机，抽今日菜谱</div>
+    <div class="HWH_dish" id="HWH_dish">—</div>
+    <div class="HWH_magLine">合成加速度：<b id="HWH_mag">0.0</b>（阈值 18）</div>
+    <button class="HWH_btn" id="HWH_permBtn">iOS 请先点这里授权</button>
+    <button class="HWH_btn HWH_gray" id="HWH_pickBtn">点我抽一次（降级方案）</button>
+  </div>
+
+  <div class="HWH_qa">
+    <div class="HWH_qa-title">验收要点</div>
+    <ul>
+      <li>一次摇动只触发一次（<b>1.5s 冷却</b>）</li>
+      <li>无加速度传感器时提示“<b>当前设备不支持</b>”，不报错、不白屏</li>
+      <li>iOS 13+ 需用户点击后调用 <b>DeviceMotionEvent.requestPermission()</b></li>
+    </ul>
+  </div>
+</section>
+
+<script>
+/* ══════════════════════════════════════════════
+   公共部分：四个任务之间切换面板
+   ══════════════════════════════════════════════ */
+
+// 功能：点击标签切换显示对应任务面板，同时高亮当前标签
+var HWH_tabs = document.querySelectorAll('.HWH_tab');
+HWH_tabs.forEach(function (HWH_tab) {
+  HWH_tab.addEventListener('click', function () {
+    // 清除所有标签的选中态
+    HWH_tabs.forEach(function (HWH_t) {
+      HWH_t.classList.remove('HWH_on');
+    });
+    HWH_tab.classList.add('HWH_on');
+
+    // 隐藏所有面板，只显示当前标签对应的那一个
+    document.querySelectorAll('.HWH_panel').forEach(function (HWH_p) {
+      HWH_p.classList.remove('HWH_on');
+    });
+    document.getElementById(HWH_tab.dataset.target).classList.add('HWH_on');
+  });
+});
+
+/* ══════════════════════════════════════════════
+   任务一：事件侦探
+   目标：把 touchstart / touchmove / touchend / click 的真实顺序打到日志里
+   ══════════════════════════════════════════════ */
+
+var HWH_probe = document.getElementById('HWH_probe');
+var HWH_logBox = document.getElementById('HWH_log');
+
+// 五个事件的计数器
+var HWH_stat = { touchstart: 0, touchmove: 0, touchend: 0, touchcancel: 0, click: 0 };
+
+// 功能：把数字补成两位，便于时间戳对齐
+function HWH_pad2(HWH_n) {
+  return HWH_n < 10 ? '0' + HWH_n : '' + HWH_n;
+}
+
+// 功能：生成 分:秒.毫秒 形式的时间戳，用来观察事件先后顺序
+function HWH_stamp() {
+  var HWH_d = new Date();
+  var HWH_ms = HWH_d.getMilliseconds();
+  return HWH_pad2(HWH_d.getMinutes()) + ':' + HWH_pad2(HWH_d.getSeconds()) + '.' +
+    (HWH_ms < 100 ? '0' + HWH_ms : '' + HWH_ms);
+}
+
+// 功能：向日志区追加一行，超过 80 行时删掉最早的一行，避免无限增长
+function HWH_writeLog(HWH_text) {
+  var HWH_line = document.createElement('div');
+  HWH_line.textContent = HWH_stamp() + '  ' + HWH_text;
+  HWH_logBox.appendChild(HWH_line);
+  HWH_logBox.scrollTop = HWH_logBox.scrollHeight;
+  if (HWH_logBox.children.length > 80) {
+    HWH_logBox.removeChild(HWH_logBox.firstChild);
+  }
+}
+
+// 功能：把内存里的计数同步到页面上方的五个数字块
+function HWH_refreshStat() {
+  document.getElementById('HWH_c_start').textContent = HWH_stat.touchstart;
+  document.getElementById('HWH_c_move').textContent = HWH_stat.touchmove;
+  document.getElementById('HWH_c_end').textContent = HWH_stat.touchend;
+  document.getElementById('HWH_c_cancel').textContent = HWH_stat.touchcancel;
+  document.getElementById('HWH_c_click').textContent = HWH_stat.click;
+}
+
+// 功能：给探针区同时挂上五个监听，统一记录触发顺序
+['touchstart', 'touchmove', 'touchend', 'touchcancel', 'click'].forEach(function (HWH_type) {
+  HWH_probe.addEventListener(HWH_type, function (HWH_e) {
+    HWH_stat[HWH_type]++;
+
+    var HWH_extra = '';
+    // 按下/移动：touches 里是屏幕上所有手指
+    if (HWH_type === 'touchstart' || HWH_type === 'touchmove') {
+      HWH_extra = '  手指 ' + HWH_e.touches.length + ' 根  clientX=' +
+        Math.round(HWH_e.touches[0].clientX);
+    } else if (HWH_type === 'touchend') {
+      // 抬手：那根手指已从 touches 移除，必须用 changedTouches
+      HWH_extra = '  剩余 ' + HWH_e.touches.length + ' 根  changedX=' +
+        Math.round(HWH_e.changedTouches[0].clientX);
+    }
+
+    HWH_writeLog('▲ ' + HWH_type + HWH_extra);
+    HWH_refreshStat();
+  }, { passive: true });
+});
+
+// 功能：清空日志区并重置所有计数
+document.getElementById('HWH_clearLog').addEventListener('click', function () {
+  HWH_logBox.innerHTML = '已清空，继续触摸试试……';
+  HWH_stat = { touchstart: 0, touchmove: 0, touchend: 0, touchcancel: 0, click: 0 };
+  HWH_refreshStat();
+});
+
+/* ══════════════════════════════════════════════
+   任务二：手势卡片（左右滑动切换）
+   三步：记起点 → 算差值 → 比较绝对值
+   ══════════════════════════════════════════════ */
+
+// 四道菜的数据：名称、简介、渐变背景
+var HWH_foods = [
+  { name: '麻婆豆腐', desc: '麻辣鲜香，川菜的灵魂', bg: 'linear-gradient(135deg, #e8590c, #f08c00)' },
+  { name: '西湖醋鱼', desc: '酸甜适口，杭州传统名菜', bg: 'linear-gradient(135deg, #1c7ed6, #4dabf7)' },
+  { name: '北京烤鸭', desc: '皮脆肉嫩，宫廷御膳', bg: 'linear-gradient(135deg, #b02a37, #e03131)' },
+  { name: '广式早茶', desc: '一盅两件，叹茶时光', bg: 'linear-gradient(135deg, #2b8a3e, #51cf66)' }
+];
+
+var HWH_foodIdx = 0;          // 当前第几张（从 0 开始）
+var HWH_swipeBox = document.getElementById('HWH_swipeBox');
+var HWH_foodCard = document.getElementById('HWH_foodCard');
+var HWH_tipEl = document.getElementById('HWH_swipeTip');
+var HWH_startX = 0;           // 按下时的横坐标
+var HWH_startY = 0;           // 按下时的纵坐标
+var HWH_cooling = false;      // 冷却中：防止快速连滑一次跳两张
+var HWH_swapping = false;     // 动画进行中：防止动画期间再次切换
+var HWH_tipTimer = null;
+
+// 功能：短暂显示边界提示文字（如“已经是第一张”）
+function HWH_showTip(HWH_msg) {
+  HWH_tipEl.textContent = HWH_msg;
+  HWH_tipEl.classList.add('HWH_show');
+  clearTimeout(HWH_tipTimer);
+  HWH_tipTimer = setTimeout(function () {
+    HWH_tipEl.classList.remove('HWH_show');
+  }, 1200);
+}
+
+// 功能：带过渡动画地把当前卡片换成第 HWH_foodIdx 道菜
+// HWH_dir > 0 表示向下一张（旧卡向左退出），< 0 表示向上一张
+function HWH_paintFood(HWH_dir) {
+  HWH_swapping = true;
+
+  // 第一段：旧卡片朝滑动方向退出并淡出
+  HWH_foodCard.style.transition = 'transform 0.15s ease, opacity 0.15s ease';
+  HWH_foodCard.style.transform = 'translateX(' + (HWH_dir > 0 ? -60 : 60) + 'px)';
+  HWH_foodCard.style.opacity = '0';
+
+  setTimeout(function () {
+    // 第二段：换成新内容，先无动画地放到反方向，再滑回原位
+    var HWH_f = HWH_foods[HWH_foodIdx];
+    HWH_foodCard.style.background = HWH_f.bg;
+    document.getElementById('HWH_foodName').textContent = HWH_f.name;
+    document.getElementById('HWH_foodDesc').textContent = HWH_f.desc;
+    document.getElementById('HWH_foodCount').textContent =
+      '第 ' + (HWH_foodIdx + 1) + ' / ' + HWH_foods.length + ' 张';
+    HWH_refreshDots();
+
+    HWH_foodCard.style.transition = 'none';
+    HWH_foodCard.style.transform = 'translateX(' + (HWH_dir > 0 ? 60 : -60) + 'px)';
+
+    // 下一帧再开启过渡，浏览器才会播放动画
+    requestAnimationFrame(function () {
+      HWH_foodCard.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+      HWH_foodCard.style.transform = 'translateX(0)';
+      HWH_foodCard.style.opacity = '1';
+      HWH_swapping = false;
+    });
+  }, 150);
+}
+
+// 功能：切换到上一张/下一张，统一处理边界提示
+// HWH_dir：1 下一张，-1 上一张；HWH_jump 传入具体下标时直接跳到那一张（点圆点用）
+function HWH_switchCard(HWH_dir, HWH_jump) {
+  if (HWH_swapping) {
+    return;
+  }
+
+  // 点圆点：直接定位到目标下标
+  if (typeof HWH_jump === 'number') {
+    HWH_foodIdx = HWH_jump;
+    HWH_paintFood(HWH_dir);
+    return;
+  }
+
+  if (HWH_dir > 0) {
+    if (HWH_foodIdx >= HWH_foods.length - 1) {
+      HWH_showTip('已经是最后一张');
+      return;
+    }
+    HWH_foodIdx++;
+  } else {
+    if (HWH_foodIdx <= 0) {
+      HWH_showTip('已经是第一张');
+      return;
+    }
+    HWH_foodIdx--;
+  }
+  HWH_paintFood(HWH_dir);
+}
+
+// 功能：判断位移是否够成一次滑动，并带 300ms 冷却，防止连滑一次跳两张
+function HWH_swipeTo(HWH_dx, HWH_dy) {
+  // 位移不足 40px → 误触；纵向位移更大 → 用户其实在滚页面
+  if (Math.abs(HWH_dx) < 40 || Math.abs(HWH_dx) <= Math.abs(HWH_dy)) {
+    return;
+  }
+  if (HWH_cooling || HWH_swapping) {
+    return;
+  }
+  HWH_cooling = true;
+  setTimeout(function () {
+    HWH_cooling = false;
+  }, 300);
+
+  HWH_switchCard(HWH_dx < 0 ? 1 : -1);
+}
+
+// 功能：按下时记录起点坐标（单指）
+HWH_swipeBox.addEventListener('touchstart', function (HWH_e) {
+  HWH_startX = HWH_e.touches[0].clientX;
+  HWH_startY = HWH_e.touches[0].clientY;
+}, { passive: true });
+
+// 功能：抬手时比较位移，决定往左还是往右切换
+HWH_swipeBox.addEventListener('touchend', function (HWH_e) {
+  // 抬手用 changedTouches，因为 touches 里这根手指已经没了
+  HWH_swipeTo(
+    HWH_e.changedTouches[0].clientX - HWH_startX,
+    HWH_e.changedTouches[0].clientY - HWH_startY
+  );
+});
+
+// ── 电脑端兜底：触摸事件在桌面浏览器不触发，这里补一套鼠标拖动 ──
+var HWH_mouseDown = false;
+var HWH_mouseX = 0;
+var HWH_mouseY = 0;
+
+// 功能：鼠标按下时记录起点
+HWH_swipeBox.addEventListener('mousedown', function (HWH_e) {
+  HWH_mouseDown = true;
+  HWH_mouseX = HWH_e.clientX;
+  HWH_mouseY = HWH_e.clientY;
+  HWH_swipeBox.style.cursor = 'grabbing';
+});
+
+// 功能：鼠标松开时算出位移，复用同一套切换逻辑
+HWH_swipeBox.addEventListener('mouseup', function (HWH_e) {
+  if (!HWH_mouseDown) {
+    return;
+  }
+  HWH_mouseDown = false;
+  HWH_swipeBox.style.cursor = 'grab';
+  HWH_swipeTo(HWH_e.clientX - HWH_mouseX, HWH_e.clientY - HWH_mouseY);
+});
+
+// 功能：鼠标移出容器时复位，避免光标卡在抓取态
+HWH_swipeBox.addEventListener('mouseleave', function () {
+  HWH_mouseDown = false;
+  HWH_swipeBox.style.cursor = 'grab';
+});
+
+// 功能：生成 4 个圆点，点击可直接跳到对应那张
+var HWH_dots = document.getElementById('HWH_dots');
+HWH_foods.forEach(function (HWH_item, HWH_i) {
+  var HWH_dot = document.createElement('span');
+  HWH_dot.className = 'HWH_dot';
+  HWH_dot.title = HWH_item.name;
+  HWH_dot.addEventListener('click', function () {
+    if (HWH_i === HWH_foodIdx || HWH_swapping) {
+      return;
+    }
+    HWH_switchCard(HWH_i > HWH_foodIdx ? 1 : -1, HWH_i);
+  });
+  HWH_dots.appendChild(HWH_dot);
+});
+
+// 功能：把圆点的选中态同步成当前这张
+function HWH_refreshDots() {
+  var HWH_all = HWH_dots.children;
+  for (var HWH_i = 0; HWH_i < HWH_all.length; HWH_i++) {
+    HWH_all[HWH_i].className = 'HWH_dot' + (HWH_i === HWH_foodIdx ? ' HWH_on' : '');
+  }
+}
+
+HWH_refreshDots();
+
+/* ══════════════════════════════════════════════
+   任务三：图片查看器（双指缩放 + 双击 + 拖动）
+   缩放公式：scale = 本帧两指距离 ÷ 上一帧两指距离
+   不跳的关键：缩放时用两指中点做基准，同步修正平移量
+   ══════════════════════════════════════════════ */
+
+var HWH_viewer = document.getElementById('HWH_viewer');
+var HWH_zoomImg = document.getElementById('HWH_zoomImg');
+
+var HWH_scale = 1;        // 当前总缩放倍数（1 ~ 4）
+var HWH_tx = 0;           // 当前横向平移
+var HWH_ty = 0;           // 当前纵向平移
+var HWH_baseScale = 1;    // 手势开始时的倍数，用于计算“本帧相对起始”的比例
+var HWH_baseTx = 0;       // 手势开始时的横向平移
+var HWH_baseTy = 0;       // 手势开始时的纵向平移
+var HWH_lastDist = 0;     // 上一帧的两指距离
+var HWH_ptrX = 0;         // 单指拖动起点 X
+var HWH_ptrY = 0;         // 单指拖动起点 Y
+var HWH_lastTap = 0;      // 上次点击时间，用于双击判断
+var HWH_moved = false;    // 本次触摸有没有明显移动（移动过就不算点击）
+
+// 功能：算两根手指之间的直线距离（勾股定理）
+function HWH_dist(HWH_t1, HWH_t2) {
+  return Math.hypot(HWH_t2.clientX - HWH_t1.clientX, HWH_t2.clientY - HWH_t1.clientY);
+}
+
+// 功能：把当前缩放与平移写进图片的 transform
+function HWH_applyTransform() {
+  HWH_zoomImg.style.transform =
+    'translate(' + HWH_tx + 'px, ' + HWH_ty + 'px) scale(' + HWH_scale + ')';
+  document.getElementById('HWH_scaleText').textContent = HWH_scale.toFixed(2);
+}
+
+// 功能：把平移量限制在边界内，避免图片被拖出容器露出黑边
+function HWH_clampPan() {
+  var HWH_r = HWH_viewer.getBoundingClientRect();
+  var HWH_maxX = Math.max(0, (HWH_scale - 1) * HWH_r.width / 2);
+  var HWH_maxY = Math.max(0, (HWH_scale - 1) * HWH_r.height / 2);
+  HWH_tx = Math.max(-HWH_maxX, Math.min(HWH_maxX, HWH_tx));
+  HWH_ty = Math.max(-HWH_maxY, Math.min(HWH_maxY, HWH_ty));
+}
+
+// 功能：按下时记录起点；两指时记录初始距离与初始倍数
+HWH_viewer.addEventListener('touchstart', function (HWH_e) {
+  HWH_moved = false;
+  HWH_zoomImg.style.transition = 'none';
+
+  if (HWH_e.touches.length >= 2) {
+    HWH_lastDist = HWH_dist(HWH_e.touches[0], HWH_e.touches[1]);
+    HWH_baseScale = HWH_scale;
+    HWH_baseTx = HWH_tx;
+    HWH_baseTy = HWH_ty;
+  } else {
+    // 单指：清空上一轮的距离，否则第一帧会拿残留数据比较导致跳一下
+    HWH_lastDist = 0;
+    HWH_ptrX = HWH_e.touches[0].clientX;
+    HWH_ptrY = HWH_e.touches[0].clientY;
+    HWH_baseTx = HWH_tx;
+    HWH_baseTy = HWH_ty;
+  }
+}, { passive: true });
+
+// 功能：移动时双指算缩放、单指算拖动
+HWH_viewer.addEventListener('touchmove', function (HWH_e) {
+  if (HWH_e.touches.length >= 2) {
+    // 阻止浏览器把双指手势当成整页缩放
+    HWH_e.preventDefault();
+
+    var HWH_d = HWH_dist(HWH_e.touches[0], HWH_e.touches[1]);
+    if (!HWH_lastDist) {
+      // 第一帧还没有“上一帧”，先存下来
+      HWH_lastDist = HWH_d;
+      return;
+    }
+
+    var HWH_r = HWH_viewer.getBoundingClientRect();
+    // 两指中点，换算成相对容器中心的坐标
+    var HWH_mx = (HWH_e.touches[0].clientX + HWH_e.touches[1].clientX) / 2 -
+      (HWH_r.left + HWH_r.width / 2);
+    var HWH_my = (HWH_e.touches[0].clientY + HWH_e.touches[1].clientY) / 2 -
+      (HWH_r.top + HWH_r.height / 2);
+
+    var HWH_s = HWH_baseScale * (HWH_d / HWH_lastDist);
+    HWH_s = Math.max(1, Math.min(4, HWH_s));
+
+    // 以两指中点为基准：t' = t0 + m × (s0 - s')
+    // 这样中点下方的像素始终跟着手指走，图片不会“跳”
+    HWH_tx = HWH_baseTx + HWH_mx * (HWH_baseScale - HWH_s);
+    HWH_ty = HWH_baseTy + HWH_my * (HWH_baseScale - HWH_s);
+
+    // 缩回 1 倍时强制居中
+    if (HWH_s === 1) {
+      HWH_tx = 0;
+      HWH_ty = 0;
+    }
+
+    HWH_scale = HWH_s;
+    HWH_moved = true;
+    HWH_applyTransform();
+  } else if (HWH_scale > 1) {
+    // 已放大：单指拖动查看细节
+    HWH_e.preventDefault();
+    var HWH_dx = HWH_e.touches[0].clientX - HWH_ptrX;
+    var HWH_dy = HWH_e.touches[0].clientY - HWH_ptrY;
+
+    if (Math.abs(HWH_dx) > 6 || Math.abs(HWH_dy) > 6) {
+      HWH_moved = true;
+    }
+
+    HWH_tx = HWH_baseTx + HWH_dx;
+    HWH_ty = HWH_baseTy + HWH_dy;
+    HWH_applyTransform();
+  }
+}, { passive: false });
+
+// 功能：抬手时收边、回弹，并判断是否双击
+HWH_viewer.addEventListener('touchend', function (HWH_e) {
+  // 缩回 1 倍就居中
+  if (HWH_scale <= 1) {
+    HWH_scale = 1;
+    HWH_tx = 0;
+    HWH_ty = 0;
+  }
+
+  HWH_clampPan();
+  HWH_zoomImg.style.transition = 'transform 0.25s ease';
+  HWH_applyTransform();
+
+  // 双击判断：单指抬起、没有明显移动、两次间隔小于 300ms
+  if (HWH_e.touches.length === 0 && HWH_e.changedTouches.length === 1 && !HWH_moved) {
+    var HWH_now = Date.now();
+    if (HWH_now - HWH_lastTap < 300) {
+      HWH_lastTap = 0;
+      if (HWH_scale > 1.2) {
+        // 当前是放大状态 → 回到 1 倍并居中
+        HWH_scale = 1;
+      } else {
+        // 当前是 1 倍 → 放大到 2 倍
+        HWH_scale = 2;
+      }
+      HWH_tx = 0;
+      HWH_ty = 0;
+      HWH_zoomImg.style.transition = 'transform 0.25s ease';
+      HWH_applyTransform();
+    } else {
+      HWH_lastTap = HWH_now;
+    }
+  }
+});
+
+// 功能：被系统打断（来电/通知）时把状态复位，避免卡在拖动态
+HWH_viewer.addEventListener('touchcancel', function () {
+  HWH_moved = false;
+  HWH_lastDist = 0;
+  HWH_zoomImg.style.transition = 'transform 0.25s ease';
+  HWH_applyTransform();
+});
+
+/* ══════════════════════════════════════════════
+   任务四：摇一摇彩蛋（设备传感器 + 降级）
+   ══════════════════════════════════════════════ */
+
+var HWH_dishes = ['红烧狮子头', '西湖醋鱼', '宫保鸡丁', '东坡肉', '白切鸡', '酸菜鱼', '小笼包', '佛跳墙'];
+var HWH_shakeCooling = false;   // 1.5 秒冷却，防止一次摇动触发多次
+var HWH_gotMotion = false;      // 是否真的收到过传感器数据
+var HWH_dishEl = document.getElementById('HWH_dish');
+var HWH_stateEl = document.getElementById('HWH_sensorState');
+
+// 功能：随机抽一道菜并播放弹出动画
+function HWH_pickDish() {
+  var HWH_i = Math.floor(Math.random() * HWH_dishes.length);
+  HWH_dishEl.textContent = HWH_dishes[HWH_i];
+  HWH_dishEl.classList.remove('HWH_pop');
+  // 强制重排，让动画可以重复播放
+  void HWH_dishEl.offsetWidth;
+  HWH_dishEl.classList.add('HWH_pop');
+  HWH_stateEl.textContent = '今日菜谱已抽到！再摇一次试试';
+}
+
+// 功能：监听设备加速度，合成加速度超过阈值判定为摇动
+function HWH_onMotion(HWH_e) {
+  var HWH_a = HWH_e.accelerationIncludingGravity;
+  // 没有数据（设备不支持）就直接返回，不报错
+  if (!HWH_a || HWH_a.x === null) {
+    return;
+  }
+
+  HWH_gotMotion = true;
+
+  // 合成加速度 = √(x² + y² + z²)，静止时约 9.8（重力）
+  var HWH_mag = Math.sqrt(
+    HWH_a.x * HWH_a.x + HWH_a.y * HWH_a.y + HWH_a.z * HWH_a.z
+  );
+  document.getElementById('HWH_mag').textContent = HWH_mag.toFixed(1);
+
+  if (HWH_mag > 18 && !HWH_shakeCooling) {
+    HWH_shakeCooling = true;
+    setTimeout(function () {
+      HWH_shakeCooling = false;
+    }, 1500);
+    HWH_pickDish();
+  }
+}
+
+window.addEventListener('devicemotion', HWH_onMotion);
+
+// 功能：监听 2 秒后仍没收到数据，说明设备不支持或未授权，给出降级提示
+setTimeout(function () {
+  if (!HWH_gotMotion) {
+    HWH_stateEl.textContent = '当前设备不支持加速度传感器，请用下方按钮抽一次';
+  }
+}, 2000);
+
+// 功能：iOS 13+ 必须由用户点击后才能申请传感器权限
+document.getElementById('HWH_permBtn').addEventListener('click', function () {
+  if (typeof DeviceMotionEvent !== 'undefined' &&
+      typeof DeviceMotionEvent.requestPermission === 'function') {
+    DeviceMotionEvent.requestPermission().then(function (HWH_state) {
+      HWH_stateEl.textContent = HWH_state === 'granted'
+        ? '已授权，摇一摇试试'
+        : '权限被拒绝，可用下方按钮抽取';
+    }).catch(function () {
+      HWH_stateEl.textContent = '权限申请失败，可用下方按钮抽取';
+    });
+  } else {
+    HWH_stateEl.textContent = '当前浏览器无需授权，直接摇动手机即可';
+  }
+});
+
+// 功能：降级方案——无论有没有传感器，都能点按钮抽一次
+document.getElementById('HWH_pickBtn').addEventListener('click', function () {
+  HWH_pickDish();
+});
+</script>
+</body>
+</html>
